@@ -9,11 +9,12 @@ using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.Collections;
 
-namespace STIScreen
+namespace STI_Queuing_System
 {
     public partial class frmDisplay : Form
     {
-        MySqlConnection con = new MySqlConnection("datasource=localhost;port=3306;username=root;password='1234'");
+        //Change password to connect to your SQL
+        MySqlConnection con = new MySqlConnection("datasource=localhost;port=3306;username=root;password='mySQL09122016'");
         /// <summary>
         /// PUBLIC VARIABLES:
         int WindowNo, count;

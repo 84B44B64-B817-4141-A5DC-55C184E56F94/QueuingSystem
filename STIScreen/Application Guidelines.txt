@@ -1,0 +1,46 @@
+"STI QUEUING SYSTEM" PROJECT
+*
+*
+APPLICATION GUIDELINES:
+
+When installing the application, the users' IP ADDRESS must be STATIC.
+This STATIC IP ADDRESS will be stored on the database (which is manually entered by the Application Manager/Developer), which in turn will be used by the application to determine which user sends data.
+
+Ex. Accounting IP Address = 10.0.54.105
+	Registrar IP Address = 10.0.54.107
+	Cashier IP Address = 10.0.54.109
+
+At the startup of the application, a CONNECTION TEST to the MYSQL SERVER will be performed. If the connection test fails, the user is prompted to ENTER the IP ADDRESS of the PC where the MYSQL SERVER is installed. Upon successful connection, the configuration is saved on a config.txt file inside the application folder. 
+
+Since the QUEUE MONITOR is connected to the ACCOUNTING WINDOW, only the ACCOUNTING USER will be able to show the form that contains the QUEUE MONITOR. This is AUTOMATICALLY detected by the application. The other two users (CASHIER & REGISTRAR) will ONLY be able to SEND DATA to the server.
+
+Each of the users has their CONTROL FORMS. This CONTROL FORM contains the buttons and controls needed to manipulate the QUEUE MONITOR.
+
+The CONTROL FORM consists of the following controls:
+1. QUEUE BUTTON - can be clicked to manipulate the QUEUE COUNTER and QUEUE TIMER. Depending on the current operation, the name of this button changes from START QUEUE/TIMER, END TIMER, NEXT QUEUE/START TIMER, respectively.
+2. CALL BUTTON - can be clicked to call the attention of the current QUEUE number. A label will indicate how many times the call button is clicked. The CALL BUTTON can only be clicked 10 seconds after the QUEUE BUTTON or itself is clicked.
+
+The TRANSACTION TIME for every QUEUE COUNTER value is saved in the database server, together with the TRANSACTION DATE. An AVERAGE TRANSACTION TIME is also displayed on the QUEUE MONITOR.
+
+The user can export the stored TRANSACTION TIME on the database server, filterable by DATE. The data can be viewed using MS Excel.
+
+Terminologies:
+1. QUEUE COUNTER - holds the current queue number on the QUEUE MONITOR.
+2. QUEUE TIMER - represents how fast a transaction was processed. It starts when the START QUEUE/TIMER (QUEUE BUTTON)or NEXT QUEUE/START TIMER is clicked.
+3. TRANSACTION TIME - determined by the duration in which END TIMER is clicked after START QUEUE/TIMER or NEXT QUEUE/START TIMER.
+4. AVERAGE TRANSACTION TIME - the average time of five consecutive transaction times.
+5. TRANSACTION DATE - day in which a transaction was made.
+
+Process Flow:
+
+REGULAR PROCESS FLOW
+Startup > Server IP Checking > User Checking > Start Queue/Timer > End Timer > Next Queue/Start Timer
+
+CALL BUTTON (Call Button is Normally Disabled)
+Start Queue/Start > (Wait for 10 seconds) > Call Button Enabled > Call Button Clicked > Increment Call Click Counter Label > Call Button Disabled > (Wait for 10 seconds) > Call Button Button Enabled
+*Note: CALL BUTTON is DISABLED when END TIMER (QUEUE BUTTON) is clicked.
+
+AVERAGE TRANSACTION TIME
+End timer > Calculate Last 5 TRANSACTION TIMEs > Display on QUEUE MONITOR
+*Note: If transactions < 5, a TRANSACTION TIME of 0:00:00.00 will be used for the other transactions.
+

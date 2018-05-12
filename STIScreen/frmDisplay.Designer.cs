@@ -1,4 +1,4 @@
-﻿namespace STIScreen
+﻿namespace STI_Queuing_System
 {
     partial class frmDisplay
     {
@@ -189,9 +189,9 @@
             this.lblNews.Font = new System.Drawing.Font("Lucida Fax", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblNews.Location = new System.Drawing.Point(1360, 569);
             this.lblNews.Name = "lblNews";
-            this.lblNews.Size = new System.Drawing.Size(1110, 43);
+            this.lblNews.Size = new System.Drawing.Size(1214, 43);
             this.lblNews.TabIndex = 4;
-            this.lblNews.Text = "PLEASE WAIT FOR YOUR NUMBER TO FLASH ON SCREEN";
+            this.lblNews.Text = "PLEASE WAIT FOR YOUR NUMBER TO FLASH ON THE SCREEN.";
             // 
             // timerNews
             // 

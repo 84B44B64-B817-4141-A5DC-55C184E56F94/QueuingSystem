@@ -25,7 +25,7 @@ namespace STI_Queuing_System
                     MessageBox.Show("Only one instance of this program can be run at a time.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                var main_form = new frmMain();
+                var main_form = new frmStart();
                 main_form.Show();
                 Application.Run();
             }

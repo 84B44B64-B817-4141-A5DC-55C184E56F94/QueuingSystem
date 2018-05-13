@@ -30,6 +30,11 @@ namespace STI_Queuing_System
 
         }
 
+        private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+
         private void aboutProgramToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -101,6 +106,7 @@ namespace STI_Queuing_System
 
         private void timClock_Tick(object sender, EventArgs e)
         {
+            //Change password for Testing
             MySqlConnection conn;
             string connectionString = "datasource= " + address + ";port=3306;username=root;password=mySQL09122016;";
             conn = new MySqlConnection(connectionString);
@@ -109,7 +115,7 @@ namespace STI_Queuing_System
                 conn.Open();
                 DBAccessible = true;
                 conn.Close();
-                access_count++;
+                access_count=0;
             }
             catch (Exception ex)
             {
@@ -227,7 +233,7 @@ namespace STI_Queuing_System
             }
             else
             {
-                Name = "Queuing System: ACCOUNTING";
+                Text = "Queuing System: ACCOUNTING";
                 user = "Accounting";
                 registerIPAddressesToolStripMenuItem.Visible = false;
             }

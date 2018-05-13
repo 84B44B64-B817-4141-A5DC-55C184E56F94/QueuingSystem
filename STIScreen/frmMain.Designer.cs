@@ -49,13 +49,17 @@
             this.lblCallCount = new System.Windows.Forms.Label();
             this.timClock = new System.Windows.Forms.Timer(this.components);
             this.lblClock = new System.Windows.Forms.Label();
+            this.lblAddress = new System.Windows.Forms.Label();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.grbMain = new System.Windows.Forms.GroupBox();
             this.menMain.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.grbMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnQueue
             // 
-            this.btnQueue.Location = new System.Drawing.Point(62, 133);
+            this.btnQueue.Location = new System.Drawing.Point(62, 121);
             this.btnQueue.Margin = new System.Windows.Forms.Padding(4);
             this.btnQueue.Name = "btnQueue";
             this.btnQueue.Size = new System.Drawing.Size(201, 59);
@@ -67,7 +71,7 @@
             // btnCall
             // 
             this.btnCall.Enabled = false;
-            this.btnCall.Location = new System.Drawing.Point(62, 200);
+            this.btnCall.Location = new System.Drawing.Point(62, 188);
             this.btnCall.Margin = new System.Windows.Forms.Padding(4);
             this.btnCall.Name = "btnCall";
             this.btnCall.Size = new System.Drawing.Size(201, 59);
@@ -86,7 +90,7 @@
             this.menMain.Location = new System.Drawing.Point(0, 0);
             this.menMain.Name = "menMain";
             this.menMain.Padding = new System.Windows.Forms.Padding(8, 3, 0, 3);
-            this.menMain.Size = new System.Drawing.Size(696, 25);
+            this.menMain.Size = new System.Drawing.Size(699, 25);
             this.menMain.TabIndex = 3;
             this.menMain.Text = "menuStrip1";
             // 
@@ -154,16 +158,16 @@
             this.groupBox1.Controls.Add(this.lblTransactTime);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.lblDisplay);
-            this.groupBox1.Location = new System.Drawing.Point(360, 28);
+            this.groupBox1.Location = new System.Drawing.Point(360, 16);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(324, 345);
+            this.groupBox1.Size = new System.Drawing.Size(324, 327);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Currently Displayed";
             // 
             // lblTransactTime
             // 
-            this.lblTransactTime.Location = new System.Drawing.Point(6, 307);
+            this.lblTransactTime.Location = new System.Drawing.Point(6, 301);
             this.lblTransactTime.Name = "lblTransactTime";
             this.lblTransactTime.Size = new System.Drawing.Size(312, 23);
             this.lblTransactTime.TabIndex = 17;
@@ -172,7 +176,7 @@
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(6, 280);
+            this.label1.Location = new System.Drawing.Point(6, 278);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(312, 23);
             this.label1.TabIndex = 16;
@@ -184,7 +188,7 @@
             this.lblDisplay.Font = new System.Drawing.Font("Arial Rounded MT Bold", 90F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDisplay.Location = new System.Drawing.Point(6, 21);
             this.lblDisplay.Name = "lblDisplay";
-            this.lblDisplay.Size = new System.Drawing.Size(312, 259);
+            this.lblDisplay.Size = new System.Drawing.Size(312, 257);
             this.lblDisplay.TabIndex = 15;
             this.lblDisplay.Text = "- - -";
             this.lblDisplay.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -192,7 +196,7 @@
             // lblCall
             // 
             this.lblCall.AutoSize = true;
-            this.lblCall.Location = new System.Drawing.Point(72, 263);
+            this.lblCall.Location = new System.Drawing.Point(72, 251);
             this.lblCall.Name = "lblCall";
             this.lblCall.Size = new System.Drawing.Size(146, 17);
             this.lblCall.TabIndex = 5;
@@ -202,7 +206,7 @@
             // lblCallCount
             // 
             this.lblCallCount.AutoSize = true;
-            this.lblCallCount.Location = new System.Drawing.Point(233, 263);
+            this.lblCallCount.Location = new System.Drawing.Point(233, 251);
             this.lblCallCount.Name = "lblCallCount";
             this.lblCallCount.Size = new System.Drawing.Size(15, 17);
             this.lblCallCount.TabIndex = 6;
@@ -217,26 +221,54 @@
             // 
             // lblClock
             // 
-            this.lblClock.Location = new System.Drawing.Point(12, 360);
+            this.lblClock.Location = new System.Drawing.Point(6, 353);
             this.lblClock.Name = "lblClock";
             this.lblClock.Size = new System.Drawing.Size(342, 17);
             this.lblClock.TabIndex = 7;
             this.lblClock.Text = "label3";
             this.lblClock.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // lblAddress
+            // 
+            this.lblAddress.AutoSize = true;
+            this.lblAddress.Location = new System.Drawing.Point(653, 0);
+            this.lblAddress.Name = "lblAddress";
+            this.lblAddress.Size = new System.Drawing.Size(0, 17);
+            this.lblAddress.TabIndex = 8;
+            this.lblAddress.Visible = false;
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.AutoSize = true;
+            this.lblStatus.Location = new System.Drawing.Point(366, 353);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(0, 17);
+            this.lblStatus.TabIndex = 9;
+            // 
+            // grbMain
+            // 
+            this.grbMain.Controls.Add(this.lblStatus);
+            this.grbMain.Controls.Add(this.btnQueue);
+            this.grbMain.Controls.Add(this.btnCall);
+            this.grbMain.Controls.Add(this.lblClock);
+            this.grbMain.Controls.Add(this.groupBox1);
+            this.grbMain.Controls.Add(this.lblCallCount);
+            this.grbMain.Controls.Add(this.lblCall);
+            this.grbMain.Location = new System.Drawing.Point(4, 32);
+            this.grbMain.Name = "grbMain";
+            this.grbMain.Size = new System.Drawing.Size(692, 381);
+            this.grbMain.TabIndex = 11;
+            this.grbMain.TabStop = false;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Yellow;
-            this.ClientSize = new System.Drawing.Size(696, 386);
-            this.Controls.Add(this.lblClock);
-            this.Controls.Add(this.lblCallCount);
-            this.Controls.Add(this.lblCall);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(699, 415);
+            this.Controls.Add(this.lblAddress);
             this.Controls.Add(this.menMain);
-            this.Controls.Add(this.btnCall);
-            this.Controls.Add(this.btnQueue);
+            this.Controls.Add(this.grbMain);
             this.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -249,6 +281,8 @@
             this.menMain.ResumeLayout(false);
             this.menMain.PerformLayout();
             this.groupBox1.ResumeLayout(false);
+            this.grbMain.ResumeLayout(false);
+            this.grbMain.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -275,5 +309,8 @@
         private System.Windows.Forms.Timer timClock;
         private System.Windows.Forms.Label lblClock;
         private System.Windows.Forms.ToolStripMenuItem registerIPAddressesToolStripMenuItem;
+        public System.Windows.Forms.Label lblAddress;
+        private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.GroupBox grbMain;
     }
 }

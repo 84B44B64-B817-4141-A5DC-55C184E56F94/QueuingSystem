@@ -16,9 +16,9 @@ namespace STI_Queuing_System
 {
     public partial class frmMain : Form
     {
-        string ip_address, user;
-        bool QueueButtonisClicked, DisplayIsChanged;
-        int time_QueueButton = 0, time_CallButton = 0, display_blinker = 0;
+        string ip_address, user, address;
+        bool QueueButtonisClicked, DisplayIsChanged, DBAccessible;
+        int time_QueueButton = 0, time_CallButton = 0, display_blinker = 0, access_count = 0;
 
         public frmMain()
         {
@@ -101,6 +101,40 @@ namespace STI_Queuing_System
 
         private void timClock_Tick(object sender, EventArgs e)
         {
+            MySqlConnection conn;
+            string connectionString = "datasource= " + address + ";port=3306;username=root;password=mySQL09122016;";
+            conn = new MySqlConnection(connectionString);
+            try
+            {
+                conn.Open();
+                DBAccessible = true;
+                conn.Close();
+                access_count++;
+            }
+            catch (Exception ex)
+            {
+                DBAccessible = false;
+                access_count++;
+            }
+
+            if (access_count <= 30)
+            {
+                lblStatus.Text = "";
+                grbMain.Enabled = true;
+            }
+            if (access_count > 30 && access_count <=  90)
+            {
+                lblStatus.Text = "Warning: Losing Database Connection...";
+                lblStatus.ForeColor = Color.Blue;
+            }
+            else if (access_count > 90)
+            {
+                lblStatus.Text = "Error: Database Connection Lost.";
+                lblStatus.ForeColor = Color.Red;
+                grbMain.Enabled = false;
+                access_count = 100;
+            }
+
             if (QueueButtonisClicked == true)
             {
                 time_QueueButton++;
@@ -158,6 +192,7 @@ namespace STI_Queuing_System
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            address = lblAddress.Text;
             lblClock.Text = DateTime.Now.ToString("MMM dd, yyyy hh:mm:ss tt");
             getIPv4();
             MySqlDataReader ip_accounting = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Accounting like '" + ip_address + "'");

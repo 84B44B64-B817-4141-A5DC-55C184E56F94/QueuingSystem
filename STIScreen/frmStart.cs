@@ -250,6 +250,7 @@ namespace STI_Queuing_System
                 if (DBAccessible == true)
                 {
                     frmMain main = new frmMain();
+                    main.lblAddress.Text = ipchecker;
                     main.Show();
                     Close();
                 }
@@ -377,6 +378,26 @@ namespace STI_Queuing_System
         private void btnClose_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void txt1st_Leave(object sender, EventArgs e)
+        {
+            txt1st.Text = (int.Parse(txt1st.Text)).ToString();
+        }
+
+        private void txt2nd_Leave(object sender, EventArgs e)
+        {
+            txt2nd.Text = (int.Parse(txt2nd.Text)).ToString();
+        }
+
+        private void txt3rd_Leave(object sender, EventArgs e)
+        {
+            txt3rd.Text = (int.Parse(txt3rd.Text)).ToString();
+        }
+
+        private void txt4th_Leave(object sender, EventArgs e)
+        {
+            txt4th.Text = (int.Parse(txt4th.Text)).ToString();
         }
     }
 }

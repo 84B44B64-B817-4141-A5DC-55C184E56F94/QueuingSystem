@@ -115,6 +115,7 @@
             this.txt4th.Visible = false;
             this.txt4th.TextChanged += new System.EventHandler(this.txt4th_TextChanged);
             this.txt4th.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt4th_KeyPress);
+            this.txt4th.Leave += new System.EventHandler(this.txt4th_Leave);
             // 
             // txt3rd
             // 
@@ -129,6 +130,7 @@
             this.txt3rd.Visible = false;
             this.txt3rd.TextChanged += new System.EventHandler(this.txt3rd_TextChanged);
             this.txt3rd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt3rd_KeyPress);
+            this.txt3rd.Leave += new System.EventHandler(this.txt3rd_Leave);
             // 
             // txt2nd
             // 
@@ -143,6 +145,7 @@
             this.txt2nd.Visible = false;
             this.txt2nd.TextChanged += new System.EventHandler(this.txt2nd_TextChanged);
             this.txt2nd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt2nd_KeyPress);
+            this.txt2nd.Leave += new System.EventHandler(this.txt2nd_Leave);
             // 
             // txt1st
             // 
@@ -157,6 +160,7 @@
             this.txt1st.Visible = false;
             this.txt1st.TextChanged += new System.EventHandler(this.txt1st_TextChanged);
             this.txt1st.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt1st_KeyPress);
+            this.txt1st.Leave += new System.EventHandler(this.txt1st_Leave);
             // 
             // btnCheck
             // 

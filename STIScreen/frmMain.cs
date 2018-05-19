@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.IO;
 using MySql.Data.MySqlClient;
@@ -11,14 +10,21 @@ using System.Media;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace STI_Queuing_System
 {
+
     public partial class frmMain : Form
     {
-        string ip_address, user, address;
+        string ip_address, user, address, transactLength, transactDate, transactTime, dateCheck;
         bool QueueButtonisClicked, DisplayIsChanged, DBAccessible;
-        int time_QueueButton = 0, time_CallButton = 0, display_blinker = 0, access_count = 0;
+        int time_QueueButton = 0, time_CallButton = 0, display_blinker = 0, access_count = 0, arrayReference = 0, arrayCounter = 0, ticket_check = 0, nextCount = 0;
+
+        double transactFraction;
+        TimeSpan value_1, value_2, value_3, value_4, value_5, sum, average;
+        DateTime timer_start, timer_stop, average_time, total_time;
+
 
         public frmMain()
         {
@@ -50,25 +56,209 @@ namespace STI_Queuing_System
                         btnQueue.Enabled = false;
                         time_QueueButton = 0;
                         time_CallButton = 0;
-                        lblDisplay.Text = "001";
+                        transactDate = DateTime.Now.ToString("yyyy-mm-dd");
+                        switch (user)
+                        {
+                            case "Accounting":
+                                {
+                                    ticket_check = Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window like '" + "1" + "'");
+                                    if (ticket_check > 0)
+                                    {
+                                        MySqlDataReader ticket_checker = Program.Query("SELECT * FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window LIKE '" + "1" + "' order by TicketNo LIMIT 0,1 ");
+                                        while (ticket_checker.Read())
+                                        {
+                                            if (!ticket_checker.IsDBNull(0))
+                                            {
+                                                lblDisplay.Text = ticket_checker.GetString(1);
+                                            }
+                                        }
+                                        ticket_checker.Close();
+                                        switch (lblDisplay.Text.Length)
+                                        {
+                                            case 1:
+                                                {
+                                                    lblDisplay.Text = "00" + lblDisplay.Text;
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    lblDisplay.Text = "0" + lblDisplay.Text;
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        lblDisplay.Text = "001";
+                                    }
+                                    break;
+                                }
+                            case "Cashier":
+                                {
+                                    ticket_check = Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window like '" + "3" + "'");
+                                    if (ticket_check > 0)
+                                    {
+                                        MySqlDataReader ticket_checker = Program.Query("SELECT * FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window LIKE '" + "3" + "' order by TicketNo LIMIT 0,1 ");
+                                        while (ticket_checker.Read())
+                                        {
+                                            if (!ticket_checker.IsDBNull(0))
+                                            {
+                                                lblDisplay.Text = ticket_checker.GetString(1);
+                                            }
+                                        }
+                                        ticket_checker.Close();
+                                        switch (lblDisplay.Text.Length)
+                                        {
+                                            case 1:
+                                                {
+                                                    lblDisplay.Text = "00" + lblDisplay.Text;
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    lblDisplay.Text = "0" + lblDisplay.Text;
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        lblDisplay.Text = "001";
+                                    }
+                                    break;
+                                }
+                            case "Registrar":
+                                {
+                                    ticket_check = Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window like '" + "2" + "'");
+                                    if (ticket_check > 0)
+                                    {
+                                        MySqlDataReader ticket_checker = Program.Query("SELECT * FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window LIKE '" + "2" + "' order by TicketNo LIMIT 0,1 ");
+                                        while (ticket_checker.Read())
+                                        {
+                                            if (!ticket_checker.IsDBNull(0))
+                                            {
+                                                lblDisplay.Text = ticket_checker.GetString(1);
+                                            }
+                                        }
+                                        ticket_checker.Close();
+                                        switch (lblDisplay.Text.Length)
+                                        {
+                                            case 1:
+                                                {
+                                                    lblDisplay.Text = "00" + lblDisplay.Text;
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    lblDisplay.Text = "0" + lblDisplay.Text;
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        lblDisplay.Text = "001";
+                                    }
+                                    break;
+                                }
+                            default:
+                                {
+                                    MessageBox.Show("ERROR: Unknown user.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    break;
+                                }
+                        }
                         DisplayIsChanged = true;
                         QueueButtonisClicked = true;
                         btnCall.Visible = true;
                         lblCall.Visible = true;
                         lblCallCount.Visible = true;
-                        //SoundPlayer player = new SoundPlayer();
-                        //player.SoundLocation = "beep.wav";
-                        //player.Play();
+                        timer_start = DateTime.Now;
+                        transactDate = DateTime.Now.ToString("yyyy-MM-dd");
+                        switch (user)
+                        {
+                            case "Accounting":
+                                {
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',Serving='" + "1" + "',Calling='" + "1" + "',transactDate='" + transactDate + "' WHERE Window='" + "1" + "'").Close();
+                                    break;
+                                }
+                            case "Cashier":
+                                {
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',Serving='" + "1" + "',Calling='" + "1" + "',transactDate='" + transactDate + "' WHERE Window='" + "3" + "'").Close();
+                                    break;
+                                }
+                            case "Registrar":
+                                {
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',Serving='" + "1" + "',Calling='" + "1" + "',transactDate='" + transactDate + "' WHERE Window='" + "2" + "'").Close();
+                                    break;
+                                }
+                            default:
+                                {
+                                    MessageBox.Show("ERROR: Unknown user.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    break;
+                                }
+                        }
                         break;
                     }
                 case "End Timer":
                     {
+                        timer_stop = DateTime.Now;
                         btnQueue.Text = "Next Queue / Start Timer";
                         btnQueue.Enabled = false;
                         btnCall.Enabled = false;
                         lblCallCount.Text = "0";
                         time_QueueButton = DateTime.Now.Second;
                         QueueButtonisClicked = true;
+                        transactLength = (timer_stop - timer_start).ToString(@"hh\:mm\:ss\.ff");
+                        transactFraction = double.Parse(transactLength.Substring(transactLength.LastIndexOf('.')));
+                        transactDate = DateTime.Now.ToString("yyyy-MM-dd");
+                        transactTime = timer_start.ToString("HH:mm:ss");
+                        switch (user)
+                        {
+                            case "Accounting":
+                                {
+                                    Program.Query("INSERT INTO dbstiqueue.tblaudit (Window,TicketNo,TransactLength,TransactFraction,TransactDate,TransactTime) VALUE ('" + "1" + "','" + lblDisplay.Text + "','" + transactLength + "','" + transactFraction + "', '" + transactDate + "','" + transactTime + "')").Close();
+                                    break;
+                                }
+                            case "Cashier":
+                                {
+                                    Program.Query("INSERT INTO dbstiqueue.tblaudit (Window,TicketNo,TransactLength,TransactFraction,TransactDate,TransactTime) VALUE ('" + "3" + "','" + lblDisplay.Text + "','" + transactLength + "', '" + transactFraction + "', '" + transactDate + "','" + transactTime + "')").Close();
+                                    break;
+                                }
+                            case "Registrar":
+                                {
+                                    Program.Query("INSERT INTO dbstiqueue.tblaudit (Window,TicketNo,TransactLength,TransactFraction,TransactDate,TransactTime) VALUE ('" + "2" + "','" + lblDisplay.Text + "','" + transactLength + "', '" + transactFraction + "', '" + transactDate + "','" + transactTime + "')").Close();
+                                    break;
+                                }
+                            default:
+                                {
+                                    MessageBox.Show("ERROR: Unknown user.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    break;
+                                }
+                        }
+                        getAverage();
+                        sum = TimeSpan.Parse("00:00:00.00");
+                        average = TimeSpan.Parse("00:00:00.00");
+                        sum = value_1 + value_2 + value_3 + value_4 + value_5;
+                        average = new TimeSpan(sum.Ticks / 5);
+                        lblTransactTime.Text = average.ToString(@"hh\:mm\:ss\.ff");
+                        switch (user)
+                        {
+                            case "Accounting":
+                                {
+                                    Program.Query("UPDATE dbstiqueue.tblscreen set Computed = '" + "1" + "', Average = '" + lblTransactTime.Text + "' where Window = '" + "1" + "'").Close();
+                                    break;
+                                }
+                            case "Cashier":
+                                {
+                                    Program.Query("UPDATE dbstiqueue.tblscreen set Computed = '" + "1" + "', Average = '" + lblTransactTime.Text + "' where Window = '" + "3" + "'").Close();
+                                    break;
+                                }
+                            case "Registrar":
+                                {
+                                    Program.Query("UPDATE dbstiqueue.tblscreen set Computed = '" + "1" + "', Average = '" + lblTransactTime.Text + "' where Window = '" + "2" + "'").Close();
+                                    break;
+                                }
+                        }
                         break;
                     }
                 case "Next Queue / Start Timer":
@@ -78,9 +268,45 @@ namespace STI_Queuing_System
                         time_QueueButton = 0;
                         time_CallButton = 0;
                         QueueButtonisClicked = true;
-                        //SoundPlayer player = new SoundPlayer();
-                        //player.SoundLocation = "beep.wav";
-                        //player.Play();
+                        timer_start = DateTime.Now;
+                        nextCount = int.Parse(lblDisplay.Text) + 1;
+                        lblDisplay.Text = nextCount.ToString();
+                        switch (lblDisplay.Text.Length)
+                        {
+                            case 1:
+                                {
+                                    lblDisplay.Text = "00" + lblDisplay.Text;
+                                    break;
+                                }
+                            case 2:
+                                {
+                                    lblDisplay.Text = "0" + lblDisplay.Text;
+                                    break;
+                                }
+                        }
+                        switch (user)
+                        {
+                            case "Accounting":
+                                {
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + nextCount + "',Serving='" + "1" + "',Calling='" + "1" + "' WHERE Window='" + "1" + "'").Close();
+                                    break;
+                                }
+                            case "Cashier":
+                                {
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + nextCount + "',Serving='" + "1" + "',Calling='" + "1" + "' WHERE Window='" + "3" + "'").Close();
+                                    break;
+                                }
+                            case "Registrar":
+                                {
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + nextCount + "',Serving='" + "1" + "',Calling='" + "1" + "' WHERE Window='" + "2" + "'").Close();
+                                    break;
+                                }
+                            default:
+                                {
+                                    MessageBox.Show("ERROR: Unknown user.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    break;
+                                }
+                        }
                         break;
                     }
             }
@@ -94,9 +320,6 @@ namespace STI_Queuing_System
 
         private void btnCall_Click(object sender, EventArgs e)
         {
-            //SoundPlayer player = new System.Media.SoundPlayer();
-            //player.SoundLocation = "beep.wav";
-            //player.Play();
             btnCall.Enabled = false;
             DisplayIsChanged = true;
             time_CallButton = 0;
@@ -106,94 +329,108 @@ namespace STI_Queuing_System
 
         private void timClock_Tick(object sender, EventArgs e)
         {
-            //Change password for Testing
-            MySqlConnection conn;
-            string connectionString = "datasource= " + address + ";port=3306;username=root;password=mySQL09122016;";
-            conn = new MySqlConnection(connectionString);
-            try
-            {
-                conn.Open();
-                DBAccessible = true;
-                conn.Close();
-                access_count=0;
-            }
-            catch (Exception ex)
-            {
-                DBAccessible = false;
-                access_count++;
-            }
-
-            if (access_count <= 30)
-            {
-                lblStatus.Text = "";
-                grbMain.Enabled = true;
-            }
-            if (access_count > 30 && access_count <=  90)
-            {
-                lblStatus.Text = "Warning: Losing Database Connection...";
-                lblStatus.ForeColor = Color.Blue;
-            }
-            else if (access_count > 90)
-            {
-                lblStatus.Text = "Error: Database Connection Lost.";
-                lblStatus.ForeColor = Color.Red;
-                grbMain.Enabled = false;
-                access_count = 100;
-            }
-
-            if (QueueButtonisClicked == true)
-            {
-                time_QueueButton++;
-                if (time_QueueButton > 9)
+                //Change password for Testing
+                MySqlConnection conn;
+                string connectionString = "datasource= " + address + ";port=3306;username=root;password=mySQL09122016;";
+                conn = new MySqlConnection(connectionString);
+                try
                 {
-                    btnQueue.Enabled = true;
-                    QueueButtonisClicked = false;
-                    time_QueueButton = 0;
+                    conn.Open();
+                    DBAccessible = true;
+                    conn.Close();
+                    access_count = 0;
                 }
-            }
-            if (btnCall.Visible == true)
-            {
-                if (btnCall.Enabled == false)
+                catch (Exception ex)
                 {
-                    time_CallButton++;
-                    if (time_CallButton > 99)
+                    DBAccessible = false;
+                    access_count++;
+                }
+
+                if (access_count <= 30)
+                {
+                    if (lblStatus.Text != "Unknown IP Address detected.")
                     {
-                        btnCall.Enabled = true;
-                        time_CallButton = 0;
+                        lblStatus.Text = "";
+                        grbMain.Enabled = true;
                     }
                 }
+                if (access_count > 30 && access_count <= 90)
+                {
+                    if (lblStatus.Text != "Unknown IP Address detected.")
+                    {
+                        lblStatus.Text = "Warning: Losing Database Connection...";
+                        lblStatus.ForeColor = Color.Blue;
+                    }
+                }
+                else if (access_count > 90)
+                {
+                    if (lblStatus.Text != "Unknown IP Address detected.")
+                    {
+                        lblStatus.Text = "Error: Database Connection Lost.";
+                        lblStatus.ForeColor = Color.Red;
+                        grbMain.Enabled = false;
+                        access_count = 100;
+                    }
+                }
+
+                if (QueueButtonisClicked == true)
+                {
+                    time_QueueButton++;
+                    if (time_QueueButton > 9)
+                    {
+                        btnQueue.Enabled = true;
+                        QueueButtonisClicked = false;
+                        time_QueueButton = 0;
+                    }
+                }
+                if (btnCall.Visible == true)
+                {
+                    if (btnCall.Enabled == false && btnQueue.Text == "End Timer")
+                    {
+                        time_CallButton++;
+                        if (time_CallButton > 99)
+                        {
+                            btnCall.Enabled = true;
+                            time_CallButton = 0;
+                        }
+                    }
+                }
+                if (DisplayIsChanged == true)
+                {
+                    textBlinker();
+                }
+                lblClock.Text = DateTime.Now.ToString("MMM dd, yyyy hh:mm:ss tt");
             }
-            if (DisplayIsChanged == true)
+
+        private void textBlinker()
+        {
+            display_blinker++;
+            if (display_blinker >= 5 && display_blinker <= 9)
             {
-                display_blinker++;
-                if (display_blinker >= 5 && display_blinker <= 9)
-                {
-                    lblDisplay.Visible = false;
-                }
-                else if (display_blinker >= 10 && display_blinker <= 14)
-                {
-                    lblDisplay.Visible = true;
-                }
-                else if (display_blinker >= 15 && display_blinker <= 19)
-                {
-                    lblDisplay.Visible = false;
-                }
-                else if (display_blinker > 19 && display_blinker <= 24)
-                {
-                    lblDisplay.Visible = true;
-                }
-                else if (display_blinker > 25 && display_blinker <= 29)
-                {
-                    lblDisplay.Visible = false;
-                }
-                else if (display_blinker > 29)
-                {
-                    lblDisplay.Visible = true;
-                    DisplayIsChanged = false;
-                    display_blinker = 0;
-                }
+                lblDisplay.Visible = false;
             }
-            lblClock.Text = DateTime.Now.ToString("MMM dd, yyyy hh:mm:ss tt");
+            else if (display_blinker >= 10 && display_blinker <= 14)
+            {
+                lblDisplay.Visible = true;
+            }
+            else if (display_blinker >= 15 && display_blinker <= 19)
+            {
+                lblDisplay.Visible = false;
+            }
+            else if (display_blinker > 19 && display_blinker <= 24)
+            {
+                lblDisplay.Visible = true;
+            }
+            else if (display_blinker > 25 && display_blinker <= 29)
+            {
+                lblDisplay.Visible = false;
+            }
+            else if (display_blinker > 29)
+            {
+                lblDisplay.Visible = true;
+                DisplayIsChanged = false;
+                display_blinker = 0;
+            }
         }
 
         private void frmMain_Load(object sender, EventArgs e)
@@ -201,18 +438,19 @@ namespace STI_Queuing_System
             address = lblAddress.Text;
             lblClock.Text = DateTime.Now.ToString("MMM dd, yyyy hh:mm:ss tt");
             getIPv4();
-            MySqlDataReader ip_accounting = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Accounting like '" + ip_address + "'");
+            MySqlDataReader ip_accounting = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Accounting LIKE '" + ip_address + "'");
             if (ip_accounting.Read() != true)
             {
-                
-                MySqlDataReader ip_cashier = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Cashier like '" + ip_address + "'");
+                MySqlDataReader ip_cashier = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Cashier LIKE '" + ip_address + "'");
                 if (ip_cashier.Read() != true)
                 {
-                    MySqlDataReader ip_regisrar = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Registrar like '" + ip_address + "'");
+                    MySqlDataReader ip_regisrar = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Registrar LIKE '" + ip_address + "'");
                     if (ip_regisrar.Read() != true)
                     {
                         Text = "Queuing System: UNKNOWN";
-                        MessageBox.Show("Unknown IP Address detected. Please reconfigure\nvia Maintenance>Register IP Addresses.", "System", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        user = "Unknown";
+                        lblStatus.Text = "Unknown IP Address detected.";
+                        lblStatus.ForeColor = Color.Red;
                         btnQueue.Enabled = false;
                     }
                     else
@@ -250,6 +488,568 @@ namespace STI_Queuing_System
                     ip_address = ip.ToString();
                 }
             }
+            return;
+        }
+
+        public void getAverage()
+        {
+            value_1 = TimeSpan.Parse("00:00:00.00");
+            value_2 = TimeSpan.Parse("00:00:00.00");
+            value_3 = TimeSpan.Parse("00:00:00.00");
+            value_4 = TimeSpan.Parse("00:00:00.00");
+            value_5 = TimeSpan.Parse("00:00:00.00");
+            transactDate = DateTime.Now.ToString("yyyy-MM-dd");
+            arrayCounter = 0;
+            switch (user)
+            {
+                case "Accounting":
+                    {
+                        arrayReference = Program.Count("SELECT COUNT(*) from dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "1" + "'");
+                        if (arrayReference < 1)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            if (arrayReference > 5)
+                            {
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "1" + "' order by TransactTime DESC LIMIT 0,5");
+                                while (fetchTime.Read())
+                                {
+                                    if (!fetchTime.IsDBNull(0))
+                                    {
+                                        switch (arrayCounter)
+                                        {
+                                            case 4:
+                                                {
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    break;
+                                                }
+                                            case 3:
+                                                {
+                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    break;
+                                                }
+                                            case 1:
+                                                {
+                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));;
+                                                    break;
+                                                }
+                                            case 0:
+                                                {
+                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));;
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    arrayCounter++;
+                                }
+                                fetchTime.Close();
+                            }
+                            else
+                            {
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window like '" + "1" + "' order by TransactTime");
+                                while (fetchTime.Read() || arrayCounter < arrayReference)
+                                {
+                                    if (!fetchTime.IsDBNull(0))
+                                    {
+                                        switch (arrayReference)
+                                        {
+                                            case 1:
+                                                {
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    value_2 = TimeSpan.Parse("00:00:00");
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 3:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 2:
+                                                            {
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 4:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 2:
+                                                            {
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 3:
+                                                            {
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 5:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 2:
+                                                            {
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 3:
+                                                            {
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 4:
+                                                            {
+                                                                value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    arrayCounter++;
+                                }
+                                fetchTime.Close();
+                            }
+                        }
+                        break;
+                    }
+                case "Cashier":
+                    {
+                        arrayReference = Program.Count("SELECT COUNT(*) from dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "3" + "'");
+                        if (arrayReference < 1)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            if (arrayReference > 5)
+                            {
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "3" + "' order by TransactTime DESC LIMIT 0,5");
+                                while (fetchTime.Read())
+                                {
+                                    if (!fetchTime.IsDBNull(0))
+                                    {
+                                        switch (arrayCounter)
+                                        {
+                                            case 4:
+                                                {
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    break;
+                                                }
+                                            case 3:
+                                                {
+                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    break;
+                                                }
+                                            case 1:
+                                                {
+                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.'))); ;
+                                                    break;
+                                                }
+                                            case 0:
+                                                {
+                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.'))); ;
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    arrayCounter++;
+                                }
+                                fetchTime.Close();
+                            }
+                            else
+                            {
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window like '" + "3" + "' order by TransactTime");
+                                while (fetchTime.Read() || arrayCounter < arrayReference)
+                                {
+                                    if (!fetchTime.IsDBNull(0))
+                                    {
+                                        switch (arrayReference)
+                                        {
+                                            case 1:
+                                                {
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    value_2 = TimeSpan.Parse("00:00:00");
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 3:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 2:
+                                                            {
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 4:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 2:
+                                                            {
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 3:
+                                                            {
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 5:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 2:
+                                                            {
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 3:
+                                                            {
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 4:
+                                                            {
+                                                                value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    arrayCounter++;
+                                }
+                                fetchTime.Close();
+                            }
+                        }
+                        break;
+                    }
+                case "Registrar":
+                    {
+                        arrayReference = Program.Count("SELECT COUNT(*) from dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "2" + "'");
+                        if (arrayReference < 1)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            if (arrayReference > 5)
+                            {
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "2" + "' order by TransactTime DESC LIMIT 0,5");
+                                while (fetchTime.Read())
+                                {
+                                    if (!fetchTime.IsDBNull(0))
+                                    {
+                                        switch (arrayCounter)
+                                        {
+                                            case 4:
+                                                {
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    break;
+                                                }
+                                            case 3:
+                                                {
+                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    break;
+                                                }
+                                            case 1:
+                                                {
+                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.'))); ;
+                                                    break;
+                                                }
+                                            case 0:
+                                                {
+                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.'))); ;
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    arrayCounter++;
+                                }
+                                fetchTime.Close();
+                            }
+                            else
+                            {
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window like '" + "2" + "' order by TransactTime");
+                                while (fetchTime.Read() || arrayCounter < arrayReference)
+                                {
+                                    if (!fetchTime.IsDBNull(0))
+                                    {
+                                        switch (arrayReference)
+                                        {
+                                            case 1:
+                                                {
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                    value_2 = TimeSpan.Parse("00:00:00");
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 3:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 2:
+                                                            {
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 4:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 2:
+                                                            {
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 3:
+                                                            {
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    value_5 = TimeSpan.Parse("00:00:00");
+                                                    break;
+                                                }
+                                            case 5:
+                                                {
+                                                    switch (arrayCounter)
+                                                    {
+                                                        case 0:
+                                                            {
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 1:
+                                                            {
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 2:
+                                                            {
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 3:
+                                                            {
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                        case 4:
+                                                            {
+                                                                value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
+                                                                break;
+                                                            }
+                                                    }
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    arrayCounter++;
+                                }
+                                fetchTime.Close();
+                            }
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        MessageBox.Show("ERROR: Unknown user.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    }
+            }
         }
     }
 }
+
+

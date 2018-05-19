@@ -4,6 +4,8 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
+using System.Net;
+using System.Net.Sockets;
 
 namespace STI_Queuing_System
 {
@@ -19,6 +21,7 @@ namespace STI_Queuing_System
         bool DBAccessible;
         System.Threading.Thread ip_checker;
         string ipchecker;
+        string ip_address;
         string path = "config.ini";
         int delay_2;
         private void frmStart_Load(object sender, EventArgs e)
@@ -249,6 +252,19 @@ namespace STI_Queuing_System
             {
                 if (DBAccessible == true)
                 {
+                    getIPV4();
+                    MySqlDataReader check = Program.Query("Select Accounting from dbstiqueue.tbladdress");
+                    while (check.Read())
+                    {
+                        string checker = check.GetString(0);
+                        if (ip_address == checker)
+                        {
+                            frmDisplay display = new frmDisplay();
+                            display.Location = Screen.AllScreens[1].WorkingArea.Location;
+                            display.Show();
+                        }
+                    }
+                    check.Close();
                     frmMain main = new frmMain();
                     main.lblAddress.Text = ipchecker;
                     main.Show();
@@ -382,22 +398,47 @@ namespace STI_Queuing_System
 
         private void txt1st_Leave(object sender, EventArgs e)
         {
-            txt1st.Text = (int.Parse(txt1st.Text)).ToString();
+            if (txt1st.Text.Trim() != "")
+            {
+                txt1st.Text = (int.Parse(txt1st.Text)).ToString();
+            }
         }
 
         private void txt2nd_Leave(object sender, EventArgs e)
         {
-            txt2nd.Text = (int.Parse(txt2nd.Text)).ToString();
+            if (txt2nd.Text.Trim() != "")
+            {
+                txt2nd.Text = (int.Parse(txt2nd.Text)).ToString();
+            }
         }
 
         private void txt3rd_Leave(object sender, EventArgs e)
         {
-            txt3rd.Text = (int.Parse(txt3rd.Text)).ToString();
+            if (txt3rd.Text.Trim() != "")
+            {
+                txt3rd.Text = (int.Parse(txt3rd.Text)).ToString();
+            }
         }
 
         private void txt4th_Leave(object sender, EventArgs e)
         {
-            txt4th.Text = (int.Parse(txt4th.Text)).ToString();
+            if (txt4th.Text.Trim() != "")
+            {
+                txt4th.Text = (int.Parse(txt4th.Text)).ToString();
+            }
+        }
+
+        private void getIPV4()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    ip_address = ip.ToString();
+                }
+            }
+            return;
         }
     }
 }

@@ -30,10 +30,9 @@ namespace STI_Queuing_System
             ip_address = ip_address.Remove(0, ip_address.IndexOf("."));
             ip_address = ip_address.Remove(0, 1);
             txt3rd.Text = ip_address.Substring(0, ip_address.IndexOf("."));
-            ip_address = ip_read.Remove(0, ip_address.IndexOf("."));
+            ip_address = ip_address.Remove(0, ip_address.IndexOf("."));
             ip_address = ip_address.Remove(0, 1);
-            txt4th.Text = ip_read;
-
+            txt4th.Text = ip_address;
             MySqlDataReader IP_Accounting = Program.Query("SELECT Accounting FROM dbstiqueue.tbladdress");
             while (IP_Accounting.Read())
             {
@@ -610,62 +609,98 @@ namespace STI_Queuing_System
 
         private void txt1stNew_Accounting_Leave(object sender, EventArgs e)
         {
-            txt1stNew_Accounting.Text = (int.Parse(txt1stNew_Accounting.Text)).ToString();
+            if (txt1stNew_Accounting.Text.Trim() != "")
+            {
+                txt1stNew_Accounting.Text = (int.Parse(txt1stNew_Accounting.Text)).ToString();
+            }
         }
 
         private void txt2ndNew_Accounting_Leave(object sender, EventArgs e)
         {
-            txt2ndNew_Accounting.Text = (int.Parse(txt2ndNew_Accounting.Text)).ToString();
+            if (txt2ndNew_Accounting.Text.Trim() != "")
+            {
+                txt2ndNew_Accounting.Text = (int.Parse(txt2ndNew_Accounting.Text)).ToString();
+            }
         }
 
         private void txt3rdNew_Accounting_Leave(object sender, EventArgs e)
         {
-            txt3rdNew_Accounting.Text = (int.Parse(txt3rdNew_Accounting.Text)).ToString();
+            if (txt2ndNew_Accounting.Text.Trim() != "")
+            {
+                txt3rdNew_Accounting.Text = (int.Parse(txt3rdNew_Accounting.Text)).ToString();
+            }
         }
 
         private void txt4thNew_Accounting_Leave(object sender, EventArgs e)
         {
-            txt4thNew_Accounting.Text = (int.Parse(txt4thNew_Accounting.Text)).ToString();
+            if (txt4thNew_Accounting.Text.Trim() != "")
+            {
+                txt4thNew_Accounting.Text = (int.Parse(txt4thNew_Accounting.Text)).ToString();
+            }
         }
 
         private void txt1stNew_Cashier_Leave(object sender, EventArgs e)
         {
-            txt1stNew_Cashier.Text = (int.Parse(txt1stNew_Cashier.Text)).ToString();
+            if (txt1stNew_Cashier.Text.Trim() != "")
+            {
+                txt1stNew_Cashier.Text = (int.Parse(txt1stNew_Cashier.Text)).ToString();
+            }
         }
 
         private void txt2ndNew_Cashier_Leave(object sender, EventArgs e)
         {
-            txt2ndNew_Cashier.Text = (int.Parse(txt2ndNew_Cashier.Text)).ToString();
+            if (txt2ndNew_Cashier.Text.Trim() != "")
+            {
+                txt2ndNew_Cashier.Text = (int.Parse(txt2ndNew_Cashier.Text)).ToString();
+            }
         }
 
         private void txt3rdNew_Cashier_Leave(object sender, EventArgs e)
         {
-            txt3rdNew_Accounting.Text = (int.Parse(txt3rdNew_Accounting.Text)).ToString();
+            if (txt3rdNew_Cashier.Text.Trim() != "")
+            {
+                txt3rdNew_Accounting.Text = (int.Parse(txt3rdNew_Accounting.Text)).ToString();
+            }
         }
 
         private void txt4thNew_Cashier_Leave(object sender, EventArgs e)
         {
-            txt4thNew_Accounting.Text = (int.Parse(txt4thNew_Accounting.Text)).ToString();
+            if (txt4thNew_Cashier.Text.Trim() != "")
+            {
+                txt4thNew_Accounting.Text = (int.Parse(txt4thNew_Accounting.Text)).ToString();
+            }
         }
 
         private void txt1stNew_Registrar_Leave(object sender, EventArgs e)
         {
-            txt1stNew_Registrar.Text = (int.Parse(txt1stNew_Registrar.Text)).ToString();
+            if (txt1stNew_Registrar.Text.Trim() != "")
+            {
+                txt1stNew_Registrar.Text = (int.Parse(txt1stNew_Registrar.Text)).ToString();
+            }
         }
 
         private void txt2ndNew_Registrar_Leave(object sender, EventArgs e)
         {
-            txt2ndNew_Registrar.Text = (int.Parse(txt2ndNew_Registrar.Text)).ToString();
+            if (txt2ndNew_Registrar.Text.Trim() != "")
+            {
+                txt2ndNew_Registrar.Text = (int.Parse(txt2ndNew_Registrar.Text)).ToString();
+            }
         }
 
         private void txt3rdNew_Registar_Leave(object sender, EventArgs e)
         {
-            txt3rdNew_Registar.Text = (int.Parse(txt3rdNew_Registar.Text)).ToString();
+            if (txt3rdNew_Registar.Text.Trim() != "")
+            {
+                txt3rdNew_Registar.Text = (int.Parse(txt3rdNew_Registar.Text)).ToString();
+            }
         }
 
         private void txt4thNew_Registrar_Leave(object sender, EventArgs e)
         {
-            txt4thNew_Accounting.Text = (int.Parse(txt4thNew_Accounting.Text)).ToString();
+            if (txt4thNew_Registrar.Text.Trim() != "")
+            {
+                txt4thNew_Accounting.Text = (int.Parse(txt4thNew_Accounting.Text)).ToString();
+            }
         }
 
         public void getIPv4()

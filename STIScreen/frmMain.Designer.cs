@@ -226,7 +226,7 @@
             this.lblClock.Size = new System.Drawing.Size(342, 17);
             this.lblClock.TabIndex = 7;
             this.lblClock.Text = "label3";
-            this.lblClock.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblClock.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblAddress
             // 

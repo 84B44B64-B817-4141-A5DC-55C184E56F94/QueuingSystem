@@ -31,13 +31,19 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDisplay));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblCashTime = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.lblCash = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lblRegTime = new System.Windows.Forms.Label();
             this.lblAcc = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.lblAccTime = new System.Windows.Forms.Label();
             this.lblReg = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.lblClock = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -54,6 +60,8 @@
             // 
             this.groupBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.groupBox1.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox1.Controls.Add(this.lblCashTime);
+            this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.lblCash);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Font = new System.Drawing.Font("Bernard MT Condensed", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -64,16 +72,34 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Window 3";
             // 
+            // lblCashTime
+            // 
+            this.lblCashTime.Font = new System.Drawing.Font("Bernard MT Condensed", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCashTime.Location = new System.Drawing.Point(0, 491);
+            this.lblCashTime.Name = "lblCashTime";
+            this.lblCashTime.Size = new System.Drawing.Size(440, 46);
+            this.lblCashTime.TabIndex = 24;
+            this.lblCashTime.Text = "00:00:00.00";
+            this.lblCashTime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label4
+            // 
+            this.label4.Location = new System.Drawing.Point(0, 454);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(440, 37);
+            this.label4.TabIndex = 23;
+            this.label4.Text = "Average  Transaction Time";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // lblCash
             // 
             this.lblCash.Font = new System.Drawing.Font("Arial Rounded MT Bold", 140.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCash.Location = new System.Drawing.Point(0, 143);
             this.lblCash.Name = "lblCash";
-            this.lblCash.Size = new System.Drawing.Size(440, 394);
+            this.lblCash.Size = new System.Drawing.Size(440, 311);
             this.lblCash.TabIndex = 13;
-            this.lblCash.Text = "888";
+            this.lblCash.Text = "---";
             this.lblCash.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lblCash.Visible = false;
             // 
             // label1
             // 
@@ -90,7 +116,9 @@
             // 
             this.groupBox2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.groupBox2.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox2.Controls.Add(this.lblRegTime);
             this.groupBox2.Controls.Add(this.lblAcc);
+            this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Font = new System.Drawing.Font("Bernard MT Condensed", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(463, 12);
@@ -100,16 +128,34 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Window 2";
             // 
+            // lblRegTime
+            // 
+            this.lblRegTime.Font = new System.Drawing.Font("Bernard MT Condensed", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblRegTime.Location = new System.Drawing.Point(6, 491);
+            this.lblRegTime.Name = "lblRegTime";
+            this.lblRegTime.Size = new System.Drawing.Size(440, 46);
+            this.lblRegTime.TabIndex = 26;
+            this.lblRegTime.Text = "00:00:00.00";
+            this.lblRegTime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // lblAcc
             // 
             this.lblAcc.Font = new System.Drawing.Font("Arial Rounded MT Bold", 140.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblAcc.Location = new System.Drawing.Point(6, 143);
             this.lblAcc.Name = "lblAcc";
-            this.lblAcc.Size = new System.Drawing.Size(428, 394);
+            this.lblAcc.Size = new System.Drawing.Size(428, 311);
             this.lblAcc.TabIndex = 14;
-            this.lblAcc.Text = "888";
+            this.lblAcc.Text = "---";
             this.lblAcc.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lblAcc.Visible = false;
+            // 
+            // label7
+            // 
+            this.label7.Location = new System.Drawing.Point(6, 454);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(440, 37);
+            this.label7.TabIndex = 25;
+            this.label7.Text = "Average  Transaction Time";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label2
             // 
@@ -121,13 +167,14 @@
             this.label2.TabIndex = 13;
             this.label2.Text = "Registrar";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // groupBox3
             // 
             this.groupBox3.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.groupBox3.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox3.Controls.Add(this.lblAccTime);
             this.groupBox3.Controls.Add(this.lblReg);
+            this.groupBox3.Controls.Add(this.label9);
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Font = new System.Drawing.Font("Bernard MT Condensed", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(914, 12);
@@ -137,16 +184,34 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Window 1";
             // 
+            // lblAccTime
+            // 
+            this.lblAccTime.Font = new System.Drawing.Font("Bernard MT Condensed", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblAccTime.Location = new System.Drawing.Point(1, 491);
+            this.lblAccTime.Name = "lblAccTime";
+            this.lblAccTime.Size = new System.Drawing.Size(440, 46);
+            this.lblAccTime.TabIndex = 28;
+            this.lblAccTime.Text = "00:00:00.00";
+            this.lblAccTime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // lblReg
             // 
             this.lblReg.Font = new System.Drawing.Font("Arial Rounded MT Bold", 140.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblReg.Location = new System.Drawing.Point(0, 143);
             this.lblReg.Name = "lblReg";
-            this.lblReg.Size = new System.Drawing.Size(434, 394);
+            this.lblReg.Size = new System.Drawing.Size(434, 311);
             this.lblReg.TabIndex = 15;
-            this.lblReg.Text = "888";
+            this.lblReg.Text = "---";
             this.lblReg.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lblReg.Visible = false;
+            // 
+            // label9
+            // 
+            this.label9.Location = new System.Drawing.Point(1, 454);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(440, 37);
+            this.label9.TabIndex = 27;
+            this.label9.Text = "Average  Transaction Time";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label3
             // 
@@ -201,7 +266,7 @@
             // 
             // timerClock
             // 
-            this.timerClock.Enabled = true;
+            this.timerClock.Interval = 1000;
             this.timerClock.Tick += new System.EventHandler(this.timerClock_Tick);
             // 
             // frmDisplay
@@ -211,11 +276,11 @@
             this.BackColor = System.Drawing.Color.Yellow;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1366, 768);
+            this.Controls.Add(this.lblNews);
             this.Controls.Add(this.lblClock);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.lblNews);
             this.Controls.Add(this.pictureBox1);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -225,7 +290,6 @@
             this.Text = "STI QUEUEING SYSTEM";
             this.TopMost = true;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
@@ -251,6 +315,12 @@
         private System.Windows.Forms.Label lblCash;
         private System.Windows.Forms.Label lblAcc;
         private System.Windows.Forms.Label lblReg;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label lblCashTime;
+        private System.Windows.Forms.Label lblRegTime;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label lblAccTime;
+        private System.Windows.Forms.Label label9;
     }
 }
 

@@ -20,7 +20,6 @@ namespace STI_Queuing_System
         string ip_address, user, address, transactLength, transactDate, transactTime;
         bool QueueButtonisClicked, DisplayIsChanged, DBAccessible;
         int time_QueueButton = 0, time_CallButton = 100, access_count = 0, arrayReference = 0, arrayCounter = 0, ticket_check = 0, nextCount = 0;
-
         double transactFraction;
         TimeSpan value_1, value_2, value_3, value_4, value_5, sum, average;
         DateTime timer_start, timer_stop;
@@ -44,6 +43,21 @@ namespace STI_Queuing_System
         private void aboutProgramToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void auditTrailToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (Form f in Application.OpenForms)
+            {
+                if (f is frmAudit)
+                {
+                    f.Focus();
+                    return;
+                }
+            }
+            frmAudit audit = new frmAudit();
+            audit.lblUser.Text = user;
+            audit.Show();
         }
 
         private void btnQueue_Click(object sender, EventArgs e)

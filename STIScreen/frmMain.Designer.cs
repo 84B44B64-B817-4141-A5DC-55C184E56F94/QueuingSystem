@@ -122,6 +122,7 @@
             this.auditTrailToolStripMenuItem.Name = "auditTrailToolStripMenuItem";
             this.auditTrailToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
             this.auditTrailToolStripMenuItem.Text = "&Audit Trail";
+            this.auditTrailToolStripMenuItem.Click += new System.EventHandler(this.auditTrailToolStripMenuItem_Click);
             // 
             // registerIPAddressesToolStripMenuItem
             // 

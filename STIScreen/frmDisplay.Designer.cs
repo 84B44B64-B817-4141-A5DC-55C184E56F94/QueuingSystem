@@ -37,12 +37,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.lblRegTime = new System.Windows.Forms.Label();
-            this.lblAcc = new System.Windows.Forms.Label();
+            this.lblReg = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.lblAccTime = new System.Windows.Forms.Label();
-            this.lblReg = new System.Windows.Forms.Label();
+            this.lblAcc = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.lblClock = new System.Windows.Forms.Label();
@@ -117,7 +117,7 @@
             this.groupBox2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.groupBox2.BackColor = System.Drawing.Color.Transparent;
             this.groupBox2.Controls.Add(this.lblRegTime);
-            this.groupBox2.Controls.Add(this.lblAcc);
+            this.groupBox2.Controls.Add(this.lblReg);
             this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Font = new System.Drawing.Font("Bernard MT Condensed", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -138,15 +138,15 @@
             this.lblRegTime.Text = "00:00:00.00";
             this.lblRegTime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // lblAcc
+            // lblReg
             // 
-            this.lblAcc.Font = new System.Drawing.Font("Arial Rounded MT Bold", 140.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblAcc.Location = new System.Drawing.Point(6, 143);
-            this.lblAcc.Name = "lblAcc";
-            this.lblAcc.Size = new System.Drawing.Size(428, 311);
-            this.lblAcc.TabIndex = 14;
-            this.lblAcc.Text = "---";
-            this.lblAcc.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblReg.Font = new System.Drawing.Font("Arial Rounded MT Bold", 140.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblReg.Location = new System.Drawing.Point(6, 143);
+            this.lblReg.Name = "lblReg";
+            this.lblReg.Size = new System.Drawing.Size(428, 311);
+            this.lblReg.TabIndex = 14;
+            this.lblReg.Text = "---";
+            this.lblReg.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label7
             // 
@@ -173,7 +173,7 @@
             this.groupBox3.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.groupBox3.BackColor = System.Drawing.Color.Transparent;
             this.groupBox3.Controls.Add(this.lblAccTime);
-            this.groupBox3.Controls.Add(this.lblReg);
+            this.groupBox3.Controls.Add(this.lblAcc);
             this.groupBox3.Controls.Add(this.label9);
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Font = new System.Drawing.Font("Bernard MT Condensed", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -194,15 +194,15 @@
             this.lblAccTime.Text = "00:00:00.00";
             this.lblAccTime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // lblReg
+            // lblAcc
             // 
-            this.lblReg.Font = new System.Drawing.Font("Arial Rounded MT Bold", 140.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblReg.Location = new System.Drawing.Point(0, 143);
-            this.lblReg.Name = "lblReg";
-            this.lblReg.Size = new System.Drawing.Size(434, 311);
-            this.lblReg.TabIndex = 15;
-            this.lblReg.Text = "---";
-            this.lblReg.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblAcc.Font = new System.Drawing.Font("Arial Rounded MT Bold", 140.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblAcc.Location = new System.Drawing.Point(0, 143);
+            this.lblAcc.Name = "lblAcc";
+            this.lblAcc.Size = new System.Drawing.Size(434, 311);
+            this.lblAcc.TabIndex = 15;
+            this.lblAcc.Text = "---";
+            this.lblAcc.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label9
             // 
@@ -266,7 +266,7 @@
             // 
             // timerClock
             // 
-            this.timerClock.Interval = 1000;
+            this.timerClock.Enabled = true;
             this.timerClock.Tick += new System.EventHandler(this.timerClock_Tick);
             // 
             // frmDisplay
@@ -313,8 +313,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label lblCash;
-        private System.Windows.Forms.Label lblAcc;
         private System.Windows.Forms.Label lblReg;
+        private System.Windows.Forms.Label lblAcc;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label lblCashTime;
         private System.Windows.Forms.Label lblRegTime;

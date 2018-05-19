@@ -15,9 +15,9 @@ namespace STI_Queuing_System
         //Change password to connect to your SQL
         /// <summary>
         /// PUBLIC VARIABLES:
-        int update_accounting, update_registrar, update_cashier, calling_accounting, calling_registrar, calling_cashier, computed_accounting, computed_registrar, computed_cashier, blinker_accounting, blinker_registrar, blinker_cashier, arrayCounter, soundCounter;
+        int update_accounting = 0, update_registrar = 0, update_cashier = 0, calling_accounting = 0, calling_registrar = 0, calling_cashier = 0, computed_accounting = 0, computed_registrar =0, computed_cashier = 0, blinker_accounting = 0, blinker_registrar = 0, blinker_cashier = 0, arrayCounter = 0, soundCounter = 0;
         string transactDate;
-        bool isUpdating, isCalling;
+        bool isUpdating, isCalling, isBlinking_Accounting, isBlinking_Registrar, isBlinking_Cashier;
 
         /// </summary>
         public frmDisplay()
@@ -27,39 +27,34 @@ namespace STI_Queuing_System
 
         private void timerClock_Tick(object sender, EventArgs e)
         {
+            transactDate = DateTime.Now.ToString("yyyy-MM-dd");
             if (isUpdating == false)
             {
                 isUpdating = true;
-                arrayCounter = 0;
-                MySqlDataReader refresher = Program.Query("SELECT * FROM dbstiqueue.tblscreen where TransactDate like '" + transactDate + "'");
-                while (refresher.Read())
+                MySqlDataReader refresher_accounting = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "1" + "' and TransactDate like '" + transactDate + "'");
+                while (refresher_accounting.Read())
                 {
-                    switch (arrayCounter)
-                    {
-                        case 0:
-                            {
-                                update_accounting = int.Parse(refresher.GetString(2));
-                                calling_accounting = int.Parse(refresher.GetString(3));
-                                computed_accounting = int.Parse(refresher.GetString(5));
-                                break;
-                            }
-                        case 1:
-                            {
-                                update_registrar = int.Parse(refresher.GetString(2));
-                                calling_registrar = int.Parse(refresher.GetString(3));
-                                computed_registrar = int.Parse(refresher.GetString(5));
-                                break;
-                            }
-                        case 2:
-                            {
-                                update_cashier = int.Parse(refresher.GetString(2));
-                                calling_cashier = int.Parse(refresher.GetString(3));
-                                computed_cashier = int.Parse(refresher.GetString(5));
-                                break;
-                            }
-                    }
-                    arrayCounter++;
+                    update_accounting = int.Parse(refresher_accounting.GetString(2));
+                    calling_accounting = int.Parse(refresher_accounting.GetString(3));
+                    computed_accounting = int.Parse(refresher_accounting.GetString(5));
                 }
+                refresher_accounting.Close();
+                MySqlDataReader refresher_registrar = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "2" + "' and TransactDate like '" + transactDate + "'");
+                while (refresher_registrar.Read())
+                {
+                    update_registrar = int.Parse(refresher_registrar.GetString(2));
+                    calling_registrar = int.Parse(refresher_registrar.GetString(3));
+                    computed_registrar = int.Parse(refresher_registrar.GetString(5));
+                }
+                refresher_registrar.Close();
+                MySqlDataReader refresher_cashier = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "3" + "' and TransactDate like '" + transactDate + "'");
+                while (refresher_cashier.Read())
+                {
+                    update_cashier = int.Parse(refresher_cashier.GetString(2));
+                    calling_cashier = int.Parse(refresher_cashier.GetString(3));
+                    computed_cashier = int.Parse(refresher_cashier.GetString(5));
+                }
+                refresher_cashier.Close();
                 if (update_accounting == 1)
                 {
                     MySqlDataReader loader = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "1" + "'");
@@ -115,7 +110,7 @@ namespace STI_Queuing_System
                             }
                         case 2:
                             {
-                                lblReg.Text = "0" + lblReg.Text;
+                                lblReg  .Text = "0" + lblReg.Text;
                                 break;
                             }
                     }
@@ -181,6 +176,18 @@ namespace STI_Queuing_System
             {
                 soundCounter++;
             }
+            if (isBlinking_Accounting == true)
+            {
+                blinkAccounting();
+            }
+            if (isBlinking_Registrar == true)
+            {
+                blinkRegistrar();
+            }
+            if (isBlinking_Cashier == true)
+            {
+                blinkCashier();
+            }
         }
 
         private void timerNews_Tick(object sender, EventArgs e)
@@ -197,6 +204,11 @@ namespace STI_Queuing_System
 
         private void AccountingCall()
         {
+            if (soundCounter > 50)
+            {
+                isCalling = false;
+                soundCounter = 0;
+            }
             if (isCalling == false)
             {
                 isCalling = true;
@@ -204,11 +216,11 @@ namespace STI_Queuing_System
                 player.SoundLocation = "beep.wav";
                 player.Play();
             }
-            if (soundCounter > 10)
-            {
-                isCalling = false;
-                soundCounter = 0;
-            }
+            isBlinking_Accounting = true;
+        }
+
+        private void blinkAccounting()
+        {
             blinker_accounting++;
             if (blinker_accounting >= 5 && blinker_accounting <= 9)
             {
@@ -234,11 +246,17 @@ namespace STI_Queuing_System
             {
                 lblAcc.Visible = true;
                 blinker_accounting = 0;
+                isBlinking_Accounting = false;
             }
         }
 
         private void RegistrarCall()
         {
+            if (soundCounter > 50)
+            {
+                isCalling = false;
+                soundCounter = 0;
+            }
             if (isCalling == false)
             {
                 isCalling = true;
@@ -246,11 +264,11 @@ namespace STI_Queuing_System
                 player.SoundLocation = "beep.wav";
                 player.Play();
             }
-            if (soundCounter > 10)
-            {
-                isCalling = false;
-                soundCounter = 0;
-            }
+            isBlinking_Registrar = true;
+        }
+
+        private void blinkRegistrar()
+        {
             blinker_registrar++;
             if (blinker_registrar >= 5 && blinker_registrar <= 9)
             {
@@ -276,11 +294,17 @@ namespace STI_Queuing_System
             {
                 lblReg.Visible = true;
                 blinker_registrar = 0;
+                isBlinking_Registrar = false;
             }
         }
 
         private void CashierCall()
         {
+            if (soundCounter > 50)
+            {
+                isCalling = false;
+                soundCounter = 0;
+            }
             if (isCalling == false)
             {
                 isCalling = true;
@@ -288,11 +312,11 @@ namespace STI_Queuing_System
                 player.SoundLocation = "beep.wav";
                 player.Play();
             }
-            if (soundCounter > 10)
-            {
-                isCalling = false;
-                soundCounter = 0;
-            }
+            isBlinking_Cashier = true;
+        }
+
+        private void blinkCashier()
+        {
             blinker_cashier++;
             if (blinker_cashier >= 5 && blinker_cashier <= 9)
             {
@@ -317,7 +341,8 @@ namespace STI_Queuing_System
             else if (blinker_cashier > 29)
             {
                 lblCash.Visible = true;
-                blinker_accounting = 0;
+                blinker_cashier = 0;
+                isBlinking_Cashier = false;
             }
         }
     }

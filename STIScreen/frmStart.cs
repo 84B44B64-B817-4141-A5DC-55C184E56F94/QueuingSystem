@@ -259,9 +259,19 @@ namespace STI_Queuing_System
                         string checker = check.GetString(0);
                         if (ip_address == checker)
                         {
-                            frmDisplay display = new frmDisplay();
-                            display.Location = Screen.AllScreens[1].WorkingArea.Location;
-                            display.Show();
+                            try
+                            {
+                                frmDisplay display = new frmDisplay();
+                                display.Location = Screen.AllScreens[1].WorkingArea.Location;
+                                display.Show();
+                            }
+                            catch
+                            {
+                                timChecker.Stop();
+                                TopMost = false;
+                                MessageBox.Show("FATAL ERROR: No secondary display detected or extended display not enabled. Application is closing.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                Application.Exit();
+                            }
                         }
                     }
                     check.Close();

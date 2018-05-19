@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.Media;
@@ -13,13 +9,10 @@ namespace STI_Queuing_System
     public partial class frmDisplay : Form
     {
         //Change password to connect to your SQL
-        /// <summary>
-        /// PUBLIC VARIABLES:
         int update_accounting = 0, update_registrar = 0, update_cashier = 0, calling_accounting = 0, calling_registrar = 0, calling_cashier = 0, computed_accounting = 0, computed_registrar =0, computed_cashier = 0, blinker_accounting = 0, blinker_registrar = 0, blinker_cashier = 0, arrayCounter = 0, soundCounter = 0;
         string transactDate;
         bool isUpdating, isCalling, isBlinking_Accounting, isBlinking_Registrar, isBlinking_Cashier;
 
-        /// </summary>
         public frmDisplay()
         {
             InitializeComponent();

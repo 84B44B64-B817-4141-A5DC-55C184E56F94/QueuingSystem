@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
-using System.IO;
 using MySql.Data.MySqlClient;
-using System.Media;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
-using System.Linq;
 
 namespace STI_Queuing_System
 {
@@ -23,7 +16,6 @@ namespace STI_Queuing_System
         double transactFraction;
         TimeSpan value_1, value_2, value_3, value_4, value_5, sum, average;
         DateTime timer_start, timer_stop;
-
 
         public frmMain()
         {

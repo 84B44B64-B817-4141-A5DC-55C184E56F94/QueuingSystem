@@ -36,11 +36,7 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.maintenanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.auditTrailToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.registerIPAddressesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutProgramToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblTransactTime = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -52,9 +48,23 @@
             this.lblAddress = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
             this.grbMain = new System.Windows.Forms.GroupBox();
+            this.notMain = new System.Windows.Forms.NotifyIcon(this.components);
+            this.ctmNotify = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menQueue_ctm = new System.Windows.Forms.ToolStripMenuItem();
+            this.menCall_ctm = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menAbout_ctm = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.menExit_ctm = new System.Windows.Forms.ToolStripMenuItem();
+            this.displayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.auditTrailToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.registerIPAddressesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutProgramToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menMain.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.grbMain.SuspendLayout();
+            this.ctmNotify.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnQueue
@@ -104,9 +114,12 @@
             // 
             // exitToolStripMenuItem
             // 
+            this.exitToolStripMenuItem.Image = global::STI_Queuing_System.Properties.Resources.link;
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
+            this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "&Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // maintenanceToolStripMenuItem
             // 
@@ -117,42 +130,13 @@
             this.maintenanceToolStripMenuItem.Size = new System.Drawing.Size(88, 19);
             this.maintenanceToolStripMenuItem.Text = "&Maintenance";
             // 
-            // auditTrailToolStripMenuItem
-            // 
-            this.auditTrailToolStripMenuItem.Name = "auditTrailToolStripMenuItem";
-            this.auditTrailToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.auditTrailToolStripMenuItem.Text = "&Audit Trail";
-            this.auditTrailToolStripMenuItem.Click += new System.EventHandler(this.auditTrailToolStripMenuItem_Click);
-            // 
-            // registerIPAddressesToolStripMenuItem
-            // 
-            this.registerIPAddressesToolStripMenuItem.Name = "registerIPAddressesToolStripMenuItem";
-            this.registerIPAddressesToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.registerIPAddressesToolStripMenuItem.Text = "&Register IP Addresses";
-            this.registerIPAddressesToolStripMenuItem.Click += new System.EventHandler(this.registerIPAddressesToolStripMenuItem_Click);
-            // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.helpToolStripMenuItem,
             this.aboutProgramToolStripMenuItem});
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(44, 19);
             this.aboutToolStripMenuItem.Text = "&Help";
-            // 
-            // helpToolStripMenuItem
-            // 
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-            this.helpToolStripMenuItem.Text = "&View Help";
-            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
-            // 
-            // aboutProgramToolStripMenuItem
-            // 
-            this.aboutProgramToolStripMenuItem.Name = "aboutProgramToolStripMenuItem";
-            this.aboutProgramToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-            this.aboutProgramToolStripMenuItem.Text = "&About Queuing System";
-            this.aboutProgramToolStripMenuItem.Click += new System.EventHandler(this.aboutProgramToolStripMenuItem_Click);
             // 
             // groupBox1
             // 
@@ -261,6 +245,105 @@
             this.grbMain.TabIndex = 11;
             this.grbMain.TabStop = false;
             // 
+            // notMain
+            // 
+            this.notMain.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.notMain.Icon = ((System.Drawing.Icon)(resources.GetObject("notMain.Icon")));
+            this.notMain.Visible = true;
+            this.notMain.DoubleClick += new System.EventHandler(this.notMain_DoubleClick);
+            this.notMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notMain_MouseClick);
+            // 
+            // ctmNotify
+            // 
+            this.ctmNotify.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.displayToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.menQueue_ctm,
+            this.menCall_ctm,
+            this.toolStripSeparator1,
+            this.menAbout_ctm,
+            this.toolStripSeparator2,
+            this.menExit_ctm});
+            this.ctmNotify.Name = "ctmNotify";
+            this.ctmNotify.ShowImageMargin = false;
+            this.ctmNotify.ShowItemToolTips = false;
+            this.ctmNotify.Size = new System.Drawing.Size(181, 132);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
+            // 
+            // menQueue_ctm
+            // 
+            this.menQueue_ctm.Name = "menQueue_ctm";
+            this.menQueue_ctm.Size = new System.Drawing.Size(180, 22);
+            this.menQueue_ctm.Text = "Start Queue / Start Timer";
+            this.menQueue_ctm.Click += new System.EventHandler(this.menQueue_ctm_Click);
+            // 
+            // menCall_ctm
+            // 
+            this.menCall_ctm.Enabled = false;
+            this.menCall_ctm.Name = "menCall_ctm";
+            this.menCall_ctm.Size = new System.Drawing.Size(180, 22);
+            this.menCall_ctm.Text = "Call Again";
+            this.menCall_ctm.Click += new System.EventHandler(this.menCall_ctm_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // menAbout_ctm
+            // 
+            this.menAbout_ctm.Name = "menAbout_ctm";
+            this.menAbout_ctm.Size = new System.Drawing.Size(180, 22);
+            this.menAbout_ctm.Text = "About";
+            this.menAbout_ctm.Click += new System.EventHandler(this.menAbout_ctm_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            // 
+            // menExit_ctm
+            // 
+            this.menExit_ctm.Name = "menExit_ctm";
+            this.menExit_ctm.Size = new System.Drawing.Size(180, 22);
+            this.menExit_ctm.Text = "Exit";
+            this.menExit_ctm.Click += new System.EventHandler(this.menExit_ctm_Click);
+            // 
+            // displayToolStripMenuItem
+            // 
+            this.displayToolStripMenuItem.Name = "displayToolStripMenuItem";
+            this.displayToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.displayToolStripMenuItem.Text = "Currently Displayed: ---";
+            this.displayToolStripMenuItem.Click += new System.EventHandler(this.displayToolStripMenuItem_Click);
+            // 
+            // auditTrailToolStripMenuItem
+            // 
+            this.auditTrailToolStripMenuItem.Image = global::STI_Queuing_System.Properties.Resources.Data;
+            this.auditTrailToolStripMenuItem.Name = "auditTrailToolStripMenuItem";
+            this.auditTrailToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.auditTrailToolStripMenuItem.Text = "&Audit Trail";
+            this.auditTrailToolStripMenuItem.Click += new System.EventHandler(this.auditTrailToolStripMenuItem_Click);
+            // 
+            // registerIPAddressesToolStripMenuItem
+            // 
+            this.registerIPAddressesToolStripMenuItem.Image = global::STI_Queuing_System.Properties.Resources.UserMaintain;
+            this.registerIPAddressesToolStripMenuItem.Name = "registerIPAddressesToolStripMenuItem";
+            this.registerIPAddressesToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.registerIPAddressesToolStripMenuItem.Text = "&Register IP Addresses";
+            this.registerIPAddressesToolStripMenuItem.Click += new System.EventHandler(this.registerIPAddressesToolStripMenuItem_Click);
+            // 
+            // aboutProgramToolStripMenuItem
+            // 
+            this.aboutProgramToolStripMenuItem.Image = global::STI_Queuing_System.Properties.Resources.Help;
+            this.aboutProgramToolStripMenuItem.Name = "aboutProgramToolStripMenuItem";
+            this.aboutProgramToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.aboutProgramToolStripMenuItem.Text = "&About Queuing System";
+            this.aboutProgramToolStripMenuItem.Click += new System.EventHandler(this.aboutProgramToolStripMenuItem_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -278,6 +361,7 @@
             this.MaximizeBox = false;
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmMain_FormClosed);
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.menMain.ResumeLayout(false);
@@ -285,6 +369,7 @@
             this.groupBox1.ResumeLayout(false);
             this.grbMain.ResumeLayout(false);
             this.grbMain.PerformLayout();
+            this.ctmNotify.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -300,7 +385,6 @@
         private System.Windows.Forms.ToolStripMenuItem maintenanceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem auditTrailToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutProgramToolStripMenuItem;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label lblDisplay;
@@ -314,5 +398,15 @@
         public System.Windows.Forms.Label lblAddress;
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.GroupBox grbMain;
+        private System.Windows.Forms.NotifyIcon notMain;
+        private System.Windows.Forms.ContextMenuStrip ctmNotify;
+        private System.Windows.Forms.ToolStripMenuItem menQueue_ctm;
+        private System.Windows.Forms.ToolStripMenuItem menCall_ctm;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem menAbout_ctm;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem menExit_ctm;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem displayToolStripMenuItem;
     }
 }

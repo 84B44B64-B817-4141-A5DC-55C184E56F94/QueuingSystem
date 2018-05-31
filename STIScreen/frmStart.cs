@@ -269,7 +269,7 @@ namespace STI_Queuing_System
                             {
                                 timChecker.Stop();
                                 TopMost = false;
-                                MessageBox.Show("FATAL ERROR: No secondary display detected or extended display not enabled. Application is closing.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("FATAL ERROR: No secondary display detected or extended display mode is not enabled. Application is closing.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 Application.Exit();
                             }
                         }

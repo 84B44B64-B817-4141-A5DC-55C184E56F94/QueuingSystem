@@ -7,7 +7,6 @@ using System.Windows.Forms;
 
 namespace STI_Queuing_System
 {
-
     public partial class frmMain : Form
     {
         string ip_address, user, address, transactLength, transactDate, transactTime;
@@ -15,16 +14,75 @@ namespace STI_Queuing_System
         int time_QueueButton = 0, time_CallButton = 100, access_count = 0, arrayReference = 0, arrayCounter = 0, ticket_check = 0, nextCount = 0;
         double transactFraction;
         TimeSpan value_1, value_2, value_3, value_4, value_5, sum, average;
+
+        private void menAbout_ctm_Click(object sender, EventArgs e)
+        {
+            aboutProgramToolStripMenuItem.PerformClick();
+        }
+
+        private void notMain_DoubleClick(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                WindowState = FormWindowState.Normal;
+            }
+            Activate();
+        }
+
+        private void displayToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                WindowState = FormWindowState.Normal;
+            }
+            Activate();
+        }
+
+        private void menExit_ctm_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void menCall_ctm_Click(object sender, EventArgs e)
+        {
+            btnCall.PerformClick();
+        }
+
+        private void menQueue_ctm_Click(object sender, EventArgs e)
+        {
+            btnQueue.PerformClick();
+        }
+
+        private void notMain_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                ctmNotify.Show(Cursor.Position);
+            }
+        }
+
+        private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                WindowState = FormWindowState.Normal;
+            }
+            if (MessageBox.Show("Exit application?", "System", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
+            {
+                e.Cancel = true;
+            }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
         DateTime timer_start, timer_stop;
 
         public frmMain()
         {
             InitializeComponent();
-        }
-
-        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
@@ -34,7 +92,8 @@ namespace STI_Queuing_System
 
         private void aboutProgramToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            frmAbout about = new frmAbout();
+            about.ShowDialog();
         }
 
         private void auditTrailToolStripMenuItem_Click(object sender, EventArgs e)
@@ -59,7 +118,9 @@ namespace STI_Queuing_System
                 case "Start Queue / Start Timer":
                     {
                         btnQueue.Text = "End Timer";
+                        menQueue_ctm.Text = "End Timer";
                         btnQueue.Enabled = false;
+                        menCall_ctm.Enabled = false;
                         time_QueueButton = 0;
                         time_CallButton = 100;
                         transactDate = DateTime.Now.ToString("yyyy-MM-dd");
@@ -97,6 +158,7 @@ namespace STI_Queuing_System
                                     {
                                         lblDisplay.Text = "001";
                                     }
+                                    displayToolStripMenuItem.Text = "Currently Displayed: " + lblDisplay.Text;
                                     break;
                                 }
                             case "Cashier":
@@ -131,6 +193,7 @@ namespace STI_Queuing_System
                                     {
                                         lblDisplay.Text = "001";
                                     }
+                                    displayToolStripMenuItem.Text = "Currently Displayed: " + lblDisplay.Text;
                                     break;
                                 }
                             case "Registrar":
@@ -165,6 +228,7 @@ namespace STI_Queuing_System
                                     {
                                         lblDisplay.Text = "001";
                                     }
+                                    displayToolStripMenuItem.Text = "Currently Displayed: " + lblDisplay.Text;
                                     break;
                                 }
                             default:
@@ -209,8 +273,10 @@ namespace STI_Queuing_System
                     {
                         timer_stop = DateTime.Now;
                         btnQueue.Text = "Next Queue / Start Timer";
+                        menQueue_ctm.Text = "Next Queue / Start Timer";
                         btnQueue.Enabled = false;
                         btnCall.Enabled = false;
+                        menCall_ctm.Enabled = false;
                         lblCallCount.Text = "0";
                         time_QueueButton = DateTime.Now.Second;
                         QueueButtonisClicked = true;
@@ -270,7 +336,9 @@ namespace STI_Queuing_System
                 case "Next Queue / Start Timer":
                     {
                         btnQueue.Text = "End Timer";
+                        menQueue_ctm.Text = "End Timer";
                         btnQueue.Enabled = false;
+                        menCall_ctm.Enabled = false;
                         time_QueueButton = 0;
                         time_CallButton = 100;
                         QueueButtonisClicked = true;
@@ -313,6 +381,7 @@ namespace STI_Queuing_System
                                     break;
                                 }
                         }
+                        displayToolStripMenuItem.Text = "Currently Displayed: " + lblDisplay.Text;
                         break;
                     }
             }
@@ -327,6 +396,7 @@ namespace STI_Queuing_System
         private void btnCall_Click(object sender, EventArgs e)
         {
             btnCall.Enabled = false;
+            menCall_ctm.Enabled = false;
             DisplayIsChanged = true;
             time_CallButton = 100;
             lblCallCount.Text = (int.Parse(lblCallCount.Text) + 1).ToString();
@@ -358,82 +428,89 @@ namespace STI_Queuing_System
 
         private void timClock_Tick(object sender, EventArgs e)
         {
-                //Change password for Testing
-                MySqlConnection conn;
-                string connectionString = "datasource= " + address + ";port=3306;username=root;password=mySQL09122016;";
-                conn = new MySqlConnection(connectionString);
-                try
-                {
-                    conn.Open();
-                    DBAccessible = true;
-                    conn.Close();
-                    access_count = 0;
-                }
-                catch (Exception ex)
-                {
-                    DBAccessible = false;
-                    access_count++;
-                }
-
-                if (access_count <= 30)
-                {
-                    if (lblStatus.Text != "Unknown IP Address detected.")
-                    {
-                        lblStatus.Text = "";
-                        grbMain.Enabled = true;
-                    }
-                }
-                if (access_count > 30 && access_count <= 90)
-                {
-                    if (lblStatus.Text != "Unknown IP Address detected.")
-                    {
-                        lblStatus.Text = "Warning: Losing Database Connection...";
-                        lblStatus.ForeColor = Color.Blue;
-                    }
-                }
-                else if (access_count > 90)
-                {
-                    if (lblStatus.Text != "Unknown IP Address detected.")
-                    {
-                        lblStatus.Text = "Error: Database Connection Lost.";
-                        lblStatus.ForeColor = Color.Red;
-                        grbMain.Enabled = false;
-                        access_count = 100;
-                    }
-                }
-
-                if (QueueButtonisClicked == true)
-                {
-                    time_QueueButton++;
-                    if (time_QueueButton > 9)
-                    {
-                        btnQueue.Enabled = true;
-                        QueueButtonisClicked = false;
-                        time_QueueButton = 0;
-                    }
-                }
-                if (btnCall.Visible == true)
-                {
-                    if (btnCall.Enabled == false && btnQueue.Text == "End Timer")
-                    {
-                        time_CallButton--;
-                        if (time_CallButton < 1)
-                        {
-                            btnCall.Enabled = true;
-                            time_CallButton = 100;
-                        }
-                        if (time_CallButton < 100)
-                        {
-                           btnCall.Text = "Call Again" + "(" + (time_CallButton / 10) + ")";
-                        }
-                        else
-                        {
-                           btnCall.Text = "Call Again";
-                        }
-                    }
-                }
-                lblClock.Text = DateTime.Now.ToString("MMM dd, yyyy hh:mm:ss tt");
+            //Change password for Testing
+            MySqlConnection conn;
+            string connectionString = "datasource= " + address + ";port=3306;username=root;password=mySQL09122016;";
+            conn = new MySqlConnection(connectionString);
+            try
+            {
+                conn.Open();
+                DBAccessible = true;
+                conn.Close();
+                access_count = 0;
             }
+            catch (Exception ex)
+            {
+                DBAccessible = false;
+                access_count++;
+            }
+
+            if (access_count <= 30)
+            {
+                if (lblStatus.Text != "Unknown IP Address detected.")
+                {
+                    lblStatus.Text = "";
+                    grbMain.Enabled = true;
+                }
+            }
+            if (access_count > 30 && access_count <= 90)
+            {
+                if (lblStatus.Text != "Unknown IP Address detected.")
+                {
+                    lblStatus.Text = "Warning: Losing Database Connection...";
+                    notMain.BalloonTipText = "Warning: Losing Database Connection..";
+                    notMain.ShowBalloonTip(60000);
+                    lblStatus.ForeColor = Color.Blue;
+                }
+            }
+            else if (access_count > 90)
+            {
+                if (lblStatus.Text != "Unknown IP Address detected.")
+                {
+                    lblStatus.Text = "Error: Database Connection Lost.";
+                    notMain.BalloonTipText = "Error: Database Connection Lost.";
+                    notMain.ShowBalloonTip(60000);
+                    lblStatus.ForeColor = Color.Red;
+                    grbMain.Enabled = false;
+                    access_count = 100;
+                }
+            }
+
+            if (QueueButtonisClicked == true)
+            {
+                time_QueueButton++;
+                if (time_QueueButton > 9)
+                {
+                    btnQueue.Enabled = true;
+                    QueueButtonisClicked = false;
+                    time_QueueButton = 0;
+                }
+            }
+            if (btnCall.Visible == true)
+            {
+                if (btnCall.Enabled == false && btnQueue.Text == "End Timer")
+                {
+                    time_CallButton--;
+                    if (time_CallButton < 1)
+                    {
+                        btnCall.Enabled = true;
+                        menCall_ctm.Enabled = true;
+                        time_CallButton = 100;
+                    }
+                    if (time_CallButton < 100)
+                    {
+                        btnCall.Text = "Call Again" + "(" + (time_CallButton / 10) + ")";
+                        menCall_ctm.Text = "Call Again" + "(" + (time_CallButton / 10) + ")";
+                    }
+                    else
+                    {
+                        btnCall.Text = "Call Again";
+                        menCall_ctm.Text = "Call Again";
+                    }
+                }
+            }
+            lblClock.Text = DateTime.Now.ToString("MMM dd, yyyy hh:mm:ss tt");
+        }
 
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -454,12 +531,16 @@ namespace STI_Queuing_System
                         lblStatus.Text = "Unknown IP Address detected.";
                         lblStatus.ForeColor = Color.Red;
                         btnQueue.Enabled = false;
+                        notMain.BalloonTipText = "Unknown IP Address detected.";
+                        notMain.ShowBalloonTip(60000);
                     }
                     else
                     {
                         Text = "Queuing System: REGISTRAR";
                         user = "Registrar";
                         registerIPAddressesToolStripMenuItem.Visible = false;
+                        notMain.BalloonTipText = "Queuing System for REGISTRAR is now ready.";
+                        notMain.ShowBalloonTip(60000);
                     }
                     ip_regisrar.Close();
                 }
@@ -468,6 +549,8 @@ namespace STI_Queuing_System
                     Text = "Queuing System: CASHIER";
                     user = "Cashier";
                     registerIPAddressesToolStripMenuItem.Visible = false;
+                    notMain.BalloonTipText = "Queuing System for CASHIER is now ready.";
+                    notMain.ShowBalloonTip(60000);
                 }
                 ip_cashier.Close();
             }
@@ -476,6 +559,8 @@ namespace STI_Queuing_System
                 Text = "Queuing System: ACCOUNTING";
                 user = "Accounting";
                 registerIPAddressesToolStripMenuItem.Visible = false;
+                notMain.BalloonTipText = "Queuing System for ACCOUNTING is now ready.";
+                notMain.ShowBalloonTip(60000);
             }
             ip_accounting.Close();
         }

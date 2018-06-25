@@ -100,6 +100,12 @@
     <Compile Include="frmMain.Designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmMini.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMini.Designer.cs">
+      <DependentUpon>frmMini.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmRegister.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,6 +131,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMini.resx">
+      <DependentUpon>frmMini.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmRegister.resx">
       <DependentUpon>frmRegister.cs</DependentUpon>
@@ -172,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <None Include="Resources\Left.gif" />
     <None Include="Resources\link.ico" />
     <None Include="Resources\Help.ico" />
     <None Include="Resources\UserMaintain.ico" />

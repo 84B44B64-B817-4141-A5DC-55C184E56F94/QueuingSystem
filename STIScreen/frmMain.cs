@@ -10,9 +10,10 @@ namespace STI_Queuing_System
     public partial class frmMain : Form
     {
         string ip_address, user, address, transactLength, transactDate, transactTime;
-        bool QueueButtonisClicked, DisplayIsChanged, DBAccessible;
-        int time_QueueButton = 0, time_CallButton = 100, access_count = 0, arrayReference = 0, arrayCounter = 0, ticket_check = 0, nextCount = 0;
-        double transactFraction;
+        bool DBAccessible;
+        public bool setIP, QueueButtonisClicked, changeView;
+        int access_count = 0, arrayReference = 0, arrayCounter = 0, ticket_check = 0, nextCount = 0;
+        public int time_QueueButton = 0, time_CallButton = 100, current_count;
         TimeSpan value_1, value_2, value_3, value_4, value_5, sum, average;
 
         private void menAbout_ctm_Click(object sender, EventArgs e)
@@ -27,6 +28,18 @@ namespace STI_Queuing_System
                 WindowState = FormWindowState.Normal;
             }
             Activate();
+        }
+
+        private void switchToCompactModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+           //READ ALL DATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            frmMini mini = new frmMini(this);
+            Screen screen = Screen.AllScreens[0];
+            mini.Left = screen.WorkingArea.Right - mini.Width;
+            mini.Top = screen.WorkingArea.Top;
+            mini.TopMost = true;
+            mini.Show();
+            Hide();
         }
 
         private void displayToolStripMenuItem_Click(object sender, EventArgs e)
@@ -67,9 +80,12 @@ namespace STI_Queuing_System
             {
                 WindowState = FormWindowState.Normal;
             }
-            if (MessageBox.Show("Exit application?", "System", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
+            if (changeView != true && setIP != true)
             {
-                e.Cancel = true;
+                if (MessageBox.Show("Exit application?", "System", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
+                {
+                    e.Cancel = true;
+                }
             }
         }
 
@@ -87,6 +103,11 @@ namespace STI_Queuing_System
 
         private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
         {
+            if (changeView != true)
+            {
+
+            }
+            Dispose();
             Application.Exit();
         }
 
@@ -120,6 +141,7 @@ namespace STI_Queuing_System
                         btnQueue.Text = "End Timer";
                         menQueue_ctm.Text = "End Timer";
                         btnQueue.Enabled = false;
+                        menQueue_ctm.Enabled = false;
                         menCall_ctm.Enabled = false;
                         time_QueueButton = 0;
                         time_CallButton = 100;
@@ -128,10 +150,10 @@ namespace STI_Queuing_System
                         {
                             case "Accounting":
                                 {
-                                    ticket_check = Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window like '" + "1" + "'");
+                                    ticket_check = Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window like '" + "Accounting" + "'");
                                     if (ticket_check > 0)
                                     {
-                                        MySqlDataReader ticket_checker = Program.Query("SELECT * FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window LIKE '" + "1" + "' order by TicketNo LIMIT 0,1 ");
+                                        MySqlDataReader ticket_checker = Program.Query("SELECT * FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window LIKE '" + "Accounting" + "' order by TicketNo LIMIT 0,1 ");
                                         while (ticket_checker.Read())
                                         {
                                             if (!ticket_checker.IsDBNull(0))
@@ -163,10 +185,10 @@ namespace STI_Queuing_System
                                 }
                             case "Cashier":
                                 {
-                                    ticket_check = Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window like '" + "3" + "'");
+                                    ticket_check = Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window like '" + "Cashier" + "'");
                                     if (ticket_check > 0)
                                     {
-                                        MySqlDataReader ticket_checker = Program.Query("SELECT * FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window LIKE '" + "3" + "' order by TicketNo LIMIT 0,1 ");
+                                        MySqlDataReader ticket_checker = Program.Query("SELECT * FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window LIKE '" + "Cashier" + "' order by TicketNo LIMIT 0,1 ");
                                         while (ticket_checker.Read())
                                         {
                                             if (!ticket_checker.IsDBNull(0))
@@ -198,10 +220,10 @@ namespace STI_Queuing_System
                                 }
                             case "Registrar":
                                 {
-                                    ticket_check = Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window like '" + "2" + "'");
+                                    ticket_check = Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window like '" + "Registrar" + "'");
                                     if (ticket_check > 0)
                                     {
-                                        MySqlDataReader ticket_checker = Program.Query("SELECT * FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window LIKE '" + "2" + "' order by TicketNo LIMIT 0,1 ");
+                                        MySqlDataReader ticket_checker = Program.Query("SELECT * FROM dbstiqueue.tblscreen WHERE TransactDate like '" + transactDate + "' and Window LIKE '" + "Registrar" + "' order by TicketNo LIMIT 0,1 ");
                                         while (ticket_checker.Read())
                                         {
                                             if (!ticket_checker.IsDBNull(0))
@@ -237,7 +259,7 @@ namespace STI_Queuing_System
                                     break;
                                 }
                         }
-                        DisplayIsChanged = true;
+                       // DisplayIsChanged = true;
                         QueueButtonisClicked = true;
                         btnCall.Visible = true;
                         lblCall.Visible = true;
@@ -248,17 +270,20 @@ namespace STI_Queuing_System
                         {
                             case "Accounting":
                                 {
-                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',Serving='" + "1" + "',Calling='" + "1" + "',transactDate='" + transactDate + "' WHERE Window='" + "1" + "'").Close();
+                                    Program.Query("INSERT INTO dbstiqueue.tblqueue (Window,TicketNo,Action,TransactDate) VALUE ('" + "Accounting" + "','" + lblDisplay.Text + "','" + "Serve" + "','" + transactDate + "')").Close();
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',transactDate='" + transactDate + "' WHERE Window='" + "Accounting" + "'").Close();
                                     break;
                                 }
                             case "Cashier":
                                 {
-                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',Serving='" + "1" + "',Calling='" + "1" + "',transactDate='" + transactDate + "' WHERE Window='" + "3" + "'").Close();
+                                    Program.Query("INSERT INTO dbstiqueue.tblqueue (Window,TicketNo,Action,TransactDate) VALUE ('" + "Cashier" + "','" + lblDisplay.Text + "','" + "Serve" + "','" + transactDate + "')").Close();
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',transactDate='" + transactDate + "' WHERE Window='" + "Cashier" + "'").Close();
                                     break;
                                 }
                             case "Registrar":
                                 {
-                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',Serving='" + "1" + "',Calling='" + "1" + "',transactDate='" + transactDate + "' WHERE Window='" + "2" + "'").Close();
+                                    Program.Query("INSERT INTO dbstiqueue.tblqueue (Window,TicketNo,Action,TransactDate) VALUE ('" + "Registrar" + "','" + lblDisplay.Text + "','" + "Serve" + "','" + transactDate + "')").Close();
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',transactDate='" + transactDate + "' WHERE Window='" + "Registrar" + "'").Close();
                                     break;
                                 }
                             default:
@@ -275,30 +300,32 @@ namespace STI_Queuing_System
                         btnQueue.Text = "Next Queue / Start Timer";
                         menQueue_ctm.Text = "Next Queue / Start Timer";
                         btnQueue.Enabled = false;
+                        menQueue_ctm.Enabled = false;
                         btnCall.Enabled = false;
                         menCall_ctm.Enabled = false;
                         lblCallCount.Text = "0";
+                        btnCall.Text = "Call Again";
                         time_QueueButton = DateTime.Now.Second;
                         QueueButtonisClicked = true;
-                        transactLength = (timer_stop - timer_start).ToString(@"hh\:mm\:ss\.ff");
-                        transactFraction = double.Parse(transactLength.Substring(transactLength.LastIndexOf('.')));
+                        transactLength = (timer_stop - timer_start).ToString(@"hh\:mm\:ss");
                         transactDate = DateTime.Now.ToString("yyyy-MM-dd");
-                        transactTime = timer_start.ToString("HH:mm:ss");
+                        transactTime = timer_start.ToString("hh:mm:ss");
+                        Program.Query("DELETE FROM dbstiqueue.tblaudit WHERE TicketNo='" + lblDisplay.Text + "' AND Window='" + user + "' AND TransactDate='" + transactDate + "'").Close();
                         switch (user)
                         {
                             case "Accounting":
                                 {
-                                    Program.Query("INSERT INTO dbstiqueue.tblaudit (Window,TicketNo,TransactLength,TransactFraction,TransactDate,TransactTime) VALUE ('" + "1" + "','" + lblDisplay.Text + "','" + transactLength + "','" + transactFraction + "', '" + transactDate + "','" + transactTime + "')").Close();
+                                    Program.Query("INSERT INTO dbstiqueue.tblaudit (Window,TicketNo,TransactLength,TransactDate,TransactTime) VALUE ('" + "Accounting" + "','" + lblDisplay.Text + "','" + transactLength + "', '" + transactDate + "','" + transactTime + "')").Close();
                                     break;
                                 }
                             case "Cashier":
                                 {
-                                    Program.Query("INSERT INTO dbstiqueue.tblaudit (Window,TicketNo,TransactLength,TransactFraction,TransactDate,TransactTime) VALUE ('" + "3" + "','" + lblDisplay.Text + "','" + transactLength + "', '" + transactFraction + "', '" + transactDate + "','" + transactTime + "')").Close();
+                                    Program.Query("INSERT INTO dbstiqueue.tblaudit (Window,TicketNo,TransactLength,TransactDate,TransactTime) VALUE ('" + "Cashier" + "','" + lblDisplay.Text + "','" + transactLength + "', '" + transactDate + "','" + transactTime + "')").Close();
                                     break;
                                 }
                             case "Registrar":
                                 {
-                                    Program.Query("INSERT INTO dbstiqueue.tblaudit (Window,TicketNo,TransactLength,TransactFraction,TransactDate,TransactTime) VALUE ('" + "2" + "','" + lblDisplay.Text + "','" + transactLength + "', '" + transactFraction + "', '" + transactDate + "','" + transactTime + "')").Close();
+                                    Program.Query("INSERT INTO dbstiqueue.tblaudit (Window,TicketNo,TransactLength,TransactDate,TransactTime) VALUE ('" + "Registrar" + "','" + lblDisplay.Text + "','" + transactLength + "', '" + transactDate + "','" + transactTime + "')").Close();
                                     break;
                                 }
                             default:
@@ -308,29 +335,11 @@ namespace STI_Queuing_System
                                 }
                         }
                         getAverage();
-                        sum = TimeSpan.Parse("00:00:00.00");
-                        average = TimeSpan.Parse("00:00:00.00");
+                        sum = TimeSpan.Parse("00:00:00");
+                        average = TimeSpan.Parse("00:00:00");
                         sum = value_1 + value_2 + value_3 + value_4 + value_5;
                         average = new TimeSpan(sum.Ticks / 5);
-                        lblTransactTime.Text = average.ToString(@"hh\:mm\:ss\.ff");
-                        switch (user)
-                        {
-                            case "Accounting":
-                                {
-                                    Program.Query("UPDATE dbstiqueue.tblscreen set Computed = '" + "1" + "', Average = '" + lblTransactTime.Text + "' where Window = '" + "1" + "'").Close();
-                                    break;
-                                }
-                            case "Cashier":
-                                {
-                                    Program.Query("UPDATE dbstiqueue.tblscreen set Computed = '" + "1" + "', Average = '" + lblTransactTime.Text + "' where Window = '" + "3" + "'").Close();
-                                    break;
-                                }
-                            case "Registrar":
-                                {
-                                    Program.Query("UPDATE dbstiqueue.tblscreen set Computed = '" + "1" + "', Average = '" + lblTransactTime.Text + "' where Window = '" + "2" + "'").Close();
-                                    break;
-                                }
-                        }
+                        lblTransactTime.Text = average.ToString(@"hh\:mm\:ss");
                         break;
                     }
                 case "Next Queue / Start Timer":
@@ -338,6 +347,7 @@ namespace STI_Queuing_System
                         btnQueue.Text = "End Timer";
                         menQueue_ctm.Text = "End Timer";
                         btnQueue.Enabled = false;
+                        menQueue_ctm.Enabled = false;
                         menCall_ctm.Enabled = false;
                         time_QueueButton = 0;
                         time_CallButton = 100;
@@ -362,17 +372,20 @@ namespace STI_Queuing_System
                         {
                             case "Accounting":
                                 {
-                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + nextCount + "',Serving='" + "1" + "',Calling='" + "1" + "' WHERE Window='" + "1" + "'").Close();
+                                    Program.Query("INSERT INTO dbstiqueue.tblqueue (Window,TicketNo,Action,TransactDate) VALUE ('" + "Accounting" + "','" + lblDisplay.Text + "','" + "Serve" + "','" + transactDate + "')").Close();
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',transactDate='" + transactDate + "' WHERE Window='" + "Accounting" + "'").Close();
                                     break;
                                 }
                             case "Cashier":
                                 {
-                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + nextCount + "',Serving='" + "1" + "',Calling='" + "1" + "' WHERE Window='" + "3" + "'").Close();
+                                    Program.Query("INSERT INTO dbstiqueue.tblqueue (Window,TicketNo,Action,TransactDate) VALUE ('" + "Cashier" + "','" + lblDisplay.Text + "','" + "Serve" + "','" + transactDate + "')").Close();
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',transactDate='" + transactDate + "' WHERE Window='" + "Cashier" + "'").Close();
                                     break;
                                 }
                             case "Registrar":
                                 {
-                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + nextCount + "',Serving='" + "1" + "',Calling='" + "1" + "' WHERE Window='" + "2" + "'").Close();
+                                    Program.Query("INSERT INTO dbstiqueue.tblqueue (Window,TicketNo,Action,TransactDate) VALUE ('" + "Registrar" + "','" + lblDisplay.Text + "','" + "Serve" + "','" + transactDate + "')").Close();
+                                    Program.Query("UPDATE dbstiqueue.tblscreen SET TicketNo='" + lblDisplay.Text + "',transactDate='" + transactDate + "' WHERE Window='" + "Registrar" + "'").Close();
                                     break;
                                 }
                             default:
@@ -387,34 +400,29 @@ namespace STI_Queuing_System
             }
         }
 
-        private void registerIPAddressesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            frmRegister register = new frmRegister();
-            register.ShowDialog();
-        }
-
         private void btnCall_Click(object sender, EventArgs e)
         {
             btnCall.Enabled = false;
             menCall_ctm.Enabled = false;
-            DisplayIsChanged = true;
+            //DisplayIsChanged = true;
             time_CallButton = 100;
             lblCallCount.Text = (int.Parse(lblCallCount.Text) + 1).ToString();
+            transactDate = DateTime.Now.ToString("yyyy-MM-dd");
             switch (user)
             {
                 case "Accounting":
                     {
-                        Program.Query("Update dbstiqueue.tblscreen set Calling = '" + "1" + "' where Window = '" + "1" + "'").Close();
+                        Program.Query("INSERT INTO dbstiqueue.tblqueue (Window,TicketNo,Action,TransactDate) VALUE ('" + "Accounting" + "','" + lblDisplay.Text + "','" + "Call" + "','" + transactDate +"')").Close();
                         break;
                     }
                 case "Cashier":
                     {
-                        Program.Query("Update dbstiqueue.tblscreen set Calling = '" + "1" + "' where Window = '" + "3" + "'").Close();
+                        Program.Query("INSERT INTO dbstiqueue.tblqueue (Window,TicketNo,Action,TransactDate) VALUE ('" + "Cashier" + "','" + lblDisplay.Text + "','" + "Call" + "','" + transactDate + "')").Close();
                         break;
                     }
                 case "Registrar":
                     {
-                        Program.Query("Update dbstiqueue.tblscreen set Calling = '" + "1" + "' where Window = '" + "2" + "'").Close();
+                        Program.Query("INSERT INTO dbstiqueue.tblqueue (Window,TicketNo,Action,TransactDate) VALUE ('" + "Registrar" + "','" + lblDisplay.Text + "','" + "Call" + "','" +transactDate + "')").Close();
                         break;
                     }
                 default:
@@ -479,9 +487,10 @@ namespace STI_Queuing_System
             if (QueueButtonisClicked == true)
             {
                 time_QueueButton++;
-                if (time_QueueButton > 9)
+                if (time_QueueButton > 39)
                 {
                     btnQueue.Enabled = true;
+                    menQueue_ctm.Enabled = true;
                     QueueButtonisClicked = false;
                     time_QueueButton = 0;
                 }
@@ -514,55 +523,35 @@ namespace STI_Queuing_System
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            address = lblAddress.Text;
+            user = lbl_user.Text;
             lblClock.Text = DateTime.Now.ToString("MMM dd, yyyy hh:mm:ss tt");
-            getIPv4();
-            MySqlDataReader ip_accounting = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Accounting LIKE '" + ip_address + "'");
-            if (ip_accounting.Read() != true)
+            switch (user)
             {
-                MySqlDataReader ip_cashier = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Cashier LIKE '" + ip_address + "'");
-                if (ip_cashier.Read() != true)
-                {
-                    MySqlDataReader ip_regisrar = Program.Query("SELECT * FROM dbstiqueue.tbladdress where Registrar LIKE '" + ip_address + "'");
-                    if (ip_regisrar.Read() != true)
+                case "Accounting":
                     {
-                        Text = "Queuing System: UNKNOWN";
-                        user = "Unknown";
-                        lblStatus.Text = "Unknown IP Address detected.";
-                        lblStatus.ForeColor = Color.Red;
-                        btnQueue.Enabled = false;
-                        notMain.BalloonTipText = "Unknown IP Address detected.";
+                        Text = "Queuing System: ACCOUNTING";
+                        user = "Accounting";
+                        notMain.BalloonTipText = "Queuing System for ACCOUNTING is now ready.";
                         notMain.ShowBalloonTip(60000);
+                        break;
                     }
-                    else
+                case "Registrar":
                     {
                         Text = "Queuing System: REGISTRAR";
                         user = "Registrar";
-                        registerIPAddressesToolStripMenuItem.Visible = false;
                         notMain.BalloonTipText = "Queuing System for REGISTRAR is now ready.";
                         notMain.ShowBalloonTip(60000);
+                        break;
                     }
-                    ip_regisrar.Close();
-                }
-                else
-                {
-                    Text = "Queuing System: CASHIER";
-                    user = "Cashier";
-                    registerIPAddressesToolStripMenuItem.Visible = false;
-                    notMain.BalloonTipText = "Queuing System for CASHIER is now ready.";
-                    notMain.ShowBalloonTip(60000);
-                }
-                ip_cashier.Close();
+                case "Cashier":
+                    {
+                        Text = "Queuing System: CASHIER";
+                        user = "Cashier";
+                        notMain.BalloonTipText = "Queuing System for CASHIER is now ready.";
+                        notMain.ShowBalloonTip(60000);
+                        break;
+                    }
             }
-            else
-            {
-                Text = "Queuing System: ACCOUNTING";
-                user = "Accounting";
-                registerIPAddressesToolStripMenuItem.Visible = false;
-                notMain.BalloonTipText = "Queuing System for ACCOUNTING is now ready.";
-                notMain.ShowBalloonTip(60000);
-            }
-            ip_accounting.Close();
         }
 
         public void getIPv4()
@@ -580,18 +569,18 @@ namespace STI_Queuing_System
 
         public void getAverage()
         {
-            value_1 = TimeSpan.Parse("00:00:00.00");
-            value_2 = TimeSpan.Parse("00:00:00.00");
-            value_3 = TimeSpan.Parse("00:00:00.00");
-            value_4 = TimeSpan.Parse("00:00:00.00");
-            value_5 = TimeSpan.Parse("00:00:00.00");
+            value_1 = TimeSpan.Parse("00:00:00");
+            value_2 = TimeSpan.Parse("00:00:00");
+            value_3 = TimeSpan.Parse("00:00:00");
+            value_4 = TimeSpan.Parse("00:00:00");
+            value_5 = TimeSpan.Parse("00:00:00");
             transactDate = DateTime.Now.ToString("yyyy-MM-dd");
             arrayCounter = 0;
             switch (user)
             {
                 case "Accounting":
                     {
-                        arrayReference = Program.Count("SELECT COUNT(*) from dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "1" + "'");
+                        arrayReference = Program.Count("SELECT COUNT(*) from dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "Accounting" + "'");
                         if (arrayReference < 1)
                         {
                             return;
@@ -600,7 +589,7 @@ namespace STI_Queuing_System
                         {
                             if (arrayReference > 5)
                             {
-                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "1" + "' order by TransactTime DESC LIMIT 0,5");
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "Accounting" + "' order by TransactTime DESC LIMIT 0,5");
                                 while (fetchTime.Read())
                                 {
                                     if (!fetchTime.IsDBNull(0))
@@ -609,62 +598,27 @@ namespace STI_Queuing_System
                                         {
                                             case 0:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 1:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 2:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 3:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_4 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 4:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_5 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                         }
@@ -675,7 +629,7 @@ namespace STI_Queuing_System
                             }
                             else
                             {
-                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window like '" + "1" + "' order by TransactTime");
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window like '" + "Accounting" + "' order by TransactTime");
                                 while (fetchTime.Read() || arrayCounter < arrayReference)
                                 {
                                     if (!fetchTime.IsDBNull(0))
@@ -684,18 +638,11 @@ namespace STI_Queuing_System
                                         {
                                             case 1:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
-                                                    value_2 = TimeSpan.Parse("00:00:00.00");
-                                                    value_3 = TimeSpan.Parse("00:00:00.00");
-                                                    value_4 = TimeSpan.Parse("00:00:00.00");
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2));
+                                                    value_2 = TimeSpan.Parse("00:00:00");
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 2:
@@ -704,32 +651,18 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
-                                                    value_3 = TimeSpan.Parse("00:00:00.00");
-                                                    value_4 = TimeSpan.Parse("00:00:00.00");
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 3:
@@ -738,43 +671,22 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 2:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
-                                                    value_4 = TimeSpan.Parse("00:00:00.00");
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 4:
@@ -783,54 +695,26 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 2:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 3:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 5:
@@ -839,62 +723,27 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 2:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 3:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 4:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_5 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
@@ -911,7 +760,7 @@ namespace STI_Queuing_System
                     }
                 case "Cashier":
                     {
-                        arrayReference = Program.Count("SELECT COUNT(*) from dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "3" + "'");
+                        arrayReference = Program.Count("SELECT COUNT(*) from dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "Cashier" + "'");
                         if (arrayReference < 1)
                         {
                             return;
@@ -920,7 +769,7 @@ namespace STI_Queuing_System
                         {
                             if (arrayReference > 5)
                             {
-                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "3" + "' order by TransactTime DESC LIMIT 0,5");
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "Cashier" + "' order by TransactTime DESC LIMIT 0,5");
                                 while (fetchTime.Read())
                                 {
                                     if (!fetchTime.IsDBNull(0))
@@ -929,62 +778,27 @@ namespace STI_Queuing_System
                                         {
                                             case 0:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 1:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 2:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 3:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_4 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 4:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_5 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                         }
@@ -995,7 +809,7 @@ namespace STI_Queuing_System
                             }
                             else
                             {
-                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window like '" + "3" + "' order by TransactTime");
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window like '" + "Cashier" + "' order by TransactTime");
                                 while (fetchTime.Read() || arrayCounter < arrayReference)
                                 {
                                     if (!fetchTime.IsDBNull(0))
@@ -1004,18 +818,11 @@ namespace STI_Queuing_System
                                         {
                                             case 1:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
-                                                    value_2 = TimeSpan.Parse("00:00:00.00");
-                                                    value_3 = TimeSpan.Parse("00:00:00.00");
-                                                    value_4 = TimeSpan.Parse("00:00:00.00");
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2));
+                                                    value_2 = TimeSpan.Parse("00:00:00");
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 2:
@@ -1024,32 +831,18 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
-                                                    value_3 = TimeSpan.Parse("00:00:00.00");
-                                                    value_4 = TimeSpan.Parse("00:00:00.00");
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 3:
@@ -1058,43 +851,22 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 2:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
-                                                    value_4 = TimeSpan.Parse("00:00:00.00");
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 4:
@@ -1103,54 +875,26 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 2:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 3:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 5:
@@ -1159,62 +903,27 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 2:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 3:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 4:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_5 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
@@ -1231,7 +940,7 @@ namespace STI_Queuing_System
                     }
                 case "Registrar":
                     {
-                        arrayReference = Program.Count("SELECT COUNT(*) from dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "2" + "'");
+                        arrayReference = Program.Count("SELECT COUNT(*) from dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "Registrar" + "'");
                         if (arrayReference < 1)
                         {
                             return;
@@ -1240,7 +949,7 @@ namespace STI_Queuing_System
                         {
                             if (arrayReference > 5)
                             {
-                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "2" + "' order by TransactTime DESC LIMIT 0,5");
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window LIKE '" + "Registrar" + "' order by TransactTime DESC LIMIT 0,5");
                                 while (fetchTime.Read())
                                 {
                                     if (!fetchTime.IsDBNull(0))
@@ -1249,62 +958,27 @@ namespace STI_Queuing_System
                                         {
                                             case 0:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 1:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 2:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 3:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_4 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                             case 4:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_5 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
+                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2));
                                                     break;
                                                 }
                                         }
@@ -1315,7 +989,7 @@ namespace STI_Queuing_System
                             }
                             else
                             {
-                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window like '" + "2" + "' order by TransactTime");
+                                MySqlDataReader fetchTime = Program.Query("SELECT * FROM dbstiqueue.tblaudit WHERE TransactDate LIKE '" + transactDate + "' and Window like '" + "Registrar" + "' order by TransactTime");
                                 while (fetchTime.Read() || arrayCounter < arrayReference)
                                 {
                                     if (!fetchTime.IsDBNull(0))
@@ -1324,18 +998,11 @@ namespace STI_Queuing_System
                                         {
                                             case 1:
                                                 {
-                                                    if (fetchTime.GetString(3) == "0")
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                    }
-                                                    else
-                                                    {
-                                                        value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                    }
-                                                    value_2 = TimeSpan.Parse("00:00:00.00");
-                                                    value_3 = TimeSpan.Parse("00:00:00.00");
-                                                    value_4 = TimeSpan.Parse("00:00:00.00");
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2));
+                                                    value_2 = TimeSpan.Parse("00:00:00");
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 2:
@@ -1344,32 +1011,18 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
-                                                    value_3 = TimeSpan.Parse("00:00:00.00");
-                                                    value_4 = TimeSpan.Parse("00:00:00.00");
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_3 = TimeSpan.Parse("00:00:00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 3:
@@ -1378,43 +1031,22 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 2:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
-                                                    value_4 = TimeSpan.Parse("00:00:00.00");
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_4 = TimeSpan.Parse("00:00:00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 4:
@@ -1423,54 +1055,26 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 2:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 3:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }
-                                                    value_5 = TimeSpan.Parse("00:00:00.00");
+                                                    value_5 = TimeSpan.Parse("00:00:00");
                                                     break;
                                                 }
                                             case 5:
@@ -1479,62 +1083,27 @@ namespace STI_Queuing_System
                                                     {
                                                         case 0:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_1 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_1 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 1:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_2 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_2 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 2:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_3 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_3 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 3:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_4 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_4 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                         case 4:
                                                             {
-                                                                if (fetchTime.GetString(3) == "0")
-                                                                {
-                                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2) + ".00");
-                                                                }
-                                                                else
-                                                                {
-                                                                    value_5 = TimeSpan.Parse(fetchTime.GetString(2) + fetchTime.GetString(3).Substring(fetchTime.GetString(3).LastIndexOf('.')));
-                                                                }
+                                                                value_5 = TimeSpan.Parse(fetchTime.GetString(2));
                                                                 break;
                                                             }
                                                     }

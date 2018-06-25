@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.NetworkInformation;
 
 namespace STI_Queuing_System
 {
@@ -22,6 +23,8 @@ namespace STI_Queuing_System
         System.Threading.Thread ip_checker;
         string ipchecker;
         string ip_address;
+        string user;
+        string MAC_address;
         string path = "config.ini";
         int delay_2;
         private void frmStart_Load(object sender, EventArgs e)
@@ -252,33 +255,56 @@ namespace STI_Queuing_System
             {
                 if (DBAccessible == true)
                 {
-                    getIPV4();
-                    MySqlDataReader check = Program.Query("Select Accounting from dbstiqueue.tbladdress");
-                    while (check.Read())
+                    MAC_address = getMACAddress();
+                    if (MAC_address == string.Empty)
                     {
-                        string checker = check.GetString(0);
-                        if (ip_address == checker)
-                        {
-                            try
-                            {
-                                frmDisplay display = new frmDisplay();
-                                display.Location = Screen.AllScreens[1].WorkingArea.Location;
-                                display.Show();
-                            }
-                            catch
-                            {
-                                timChecker.Stop();
-                                TopMost = false;
-                                MessageBox.Show("FATAL ERROR: No secondary display detected or extended display mode is not enabled. Application is closing.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                Application.Exit();
-                            }
-                        }
+                        timChecker.Stop();
+                        MessageBox.Show("ERROR: No network connection detected.\nPlease make sure that PC is connected to a network.", "System", MessageBoxButtons.OK,MessageBoxIcon.Error);
+                        Application.Exit();
                     }
-                    check.Close();
-                    frmMain main = new frmMain();
-                    main.lblAddress.Text = ipchecker;
-                    main.Show();
-                    Close();
+
+                    MySqlDataReader check_MAC = Program.Query("SELECT * from dbstiqueue.tbladdress where MAC_Address like '" + MAC_address + "'");
+                    if (check_MAC.Read() != true)
+                    {
+                        timChecker.Stop();
+                        frmRegister reg = new frmRegister();
+                        reg.lbl_MAC.Text = MAC_address;
+                        reg.lbl_IPAddress.Text = getIPv4();
+                        Close();
+                        reg.ShowDialog();
+                    }
+                    else
+                    {
+                        Program.Query("UPDATE dbstiqueue.tbladdress SET IP_Address= '" + getIPv4() + "' WHERE MAC_Address='" + MAC_address + "'").Close();
+                        MySqlDataReader check = Program.Query("SELECT * FROM dbstiqueue.tbladdress WHERE MAC_Address='" + MAC_address + "'");
+                        while (check.Read())
+                        {
+                            user = check.GetString(0);
+                            if (user == "Accounting")
+                            {
+                                try
+                                {
+                                    frmDisplay display = new frmDisplay();
+                                    display.Location = Screen.AllScreens[1].WorkingArea.Location;
+                                    display.Show();
+                                }
+                                catch
+                                {
+                                    timChecker.Stop();
+                                    TopMost = false;
+                                    MessageBox.Show("ERROR: No secondary display detected or extended display mode is not enabled. Application is closing.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    Dispose();
+                                    Application.Exit();
+                                }
+                            }
+
+                        }
+                        check.Close();
+                        frmMain main = new frmMain();
+                        main.lbl_user.Text = user;
+                        main.Show();
+                        Close();
+                    }
                 }
                 else
                 {
@@ -306,6 +332,7 @@ namespace STI_Queuing_System
                 }
             }
         }
+
         void showMessage()
         {
             MessageBox.Show("Connection to MySQL Server failed.\nPlease reconfigure your Server IP Address.", "System", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -438,7 +465,7 @@ namespace STI_Queuing_System
             }
         }
 
-        private void getIPV4()
+        private string getIPv4()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
@@ -448,7 +475,23 @@ namespace STI_Queuing_System
                     ip_address = ip.ToString();
                 }
             }
-            return;
+            return ip_address;
+        }
+
+        private string getMACAddress()
+        {
+            string macAddresses = string.Empty;
+
+            foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (nic.OperationalStatus == OperationalStatus.Up)
+                {
+                    macAddresses += nic.GetPhysicalAddress().ToString();
+                    break;
+                }
+            }
+
+            return macAddresses;
         }
     }
 }

@@ -3,184 +3,962 @@ using System.Drawing;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.Media;
+using System.Threading;
 
 namespace STI_Queuing_System
 {
     public partial class frmDisplay : Form
     {
         //Change password to connect to your SQL
-        int update_accounting = 0, update_registrar = 0, update_cashier = 0, calling_accounting = 0, calling_registrar = 0, calling_cashier = 0, computed_accounting = 0, computed_registrar =0, computed_cashier = 0, blinker_accounting = 0, blinker_registrar = 0, blinker_cashier = 0, arrayCounter = 0, soundCounter = 0;
+        int blinker = 0;
+        int hundredths, tenths;
+        int num;
+        SoundPlayer tone = new SoundPlayer();
+        Thread forServe, forCall;
         string transactDate;
-        bool isUpdating, isCalling, isBlinking_Accounting, isBlinking_Registrar, isBlinking_Cashier;
+        string display, user, action;
+        bool isUpdating, isBlinking;
+        bool isHundred, isTwenty;
 
         public frmDisplay()
         {
             InitializeComponent();
         }
 
+        private void timerBlink_Tick(object sender, EventArgs e)
+        {
+            if (isBlinking == true)
+            {
+                blinker++;
+                if (blinker >= 5 && blinker <= 9)
+                {
+                    switch (user)
+                    {
+                        case "Accounting":
+                            {
+                                lblAccounting.Visible = false;
+                                break;
+                            }
+                        case "Cashier":
+                            {
+                                lblCashier.Visible = false;
+                                break;
+                            }
+                        case "Registrar":
+                            {
+                                lblRegistrar.Visible = false;
+                                break;
+                            }
+                    }
+                }
+                else if (blinker >= 10 && blinker <= 14)
+                {
+                    switch (user)
+                    {
+                        case "Accounting":
+                            {
+                                lblAccounting.Visible = true;
+                                break;
+                            }
+                        case "Cashier":
+                            {
+                                lblCashier.Visible = true;
+                                break;
+                            }
+                        case "Registrar":
+                            {
+                                lblRegistrar.Visible = true;
+                                break;
+                            }
+                    }
+                }
+                else if (blinker >= 15 && blinker <= 19)
+                {
+                    switch (user)
+                    {
+                        case "Accounting":
+                            {
+                                lblAccounting.Visible = false;
+                                break;
+                            }
+                        case "Cashier":
+                            {
+                                lblCashier.Visible = false;
+                                break;
+                            }
+                        case "Registrar":
+                            {
+                                lblRegistrar.Visible = false;
+                                break;
+                            }
+                    }
+                }
+                else if (blinker > 19 && blinker <= 24)
+                {
+                    switch (user)
+                    {
+                        case "Accounting":
+                            {
+                                lblAccounting.Visible = true;
+                                break;
+                            }
+                        case "Cashier":
+                            {
+                                lblCashier.Visible = true;
+                                break;
+                            }
+                        case "Registrar":
+                            {
+                                lblRegistrar.Visible = true;
+                                break;
+                            }
+                    }
+                }
+                else if (blinker > 25 && blinker <= 29)
+                {
+                    switch (user)
+                    {
+                        case "Accounting":
+                            {
+                                lblAccounting.Visible = false;
+                                break;
+                            }
+                        case "Cashier":
+                            {
+                                lblCashier.Visible = false;
+                                break;
+                            }
+                        case "Registrar":
+                            {
+                                lblRegistrar.Visible = false;
+                                break;
+                            }
+                    }
+                }
+                else if (blinker > 29)
+                {
+                    switch (user)
+                    {
+                        case "Accounting":
+                            {
+                                lblAccounting.Visible = true;
+                                break;
+                            }
+                        case "Cashier":
+                            {
+                                lblCashier.Visible = true;
+                                break;
+                            }
+                        case "Registrar":
+                            {
+                                lblRegistrar.Visible = true;
+                                break;
+                            }
+                    }
+                    blinker = 0;
+                    isBlinking = false;
+                }
+            }
+        }
+
         private void timerClock_Tick(object sender, EventArgs e)
         {
             transactDate = DateTime.Now.ToString("yyyy-MM-dd");
+
             if (isUpdating == false)
             {
                 isUpdating = true;
-                MySqlDataReader refresher_accounting = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "1" + "' and TransactDate like '" + transactDate + "'");
-                while (refresher_accounting.Read())
+
+                if (Program.Count("SELECT COUNT(*) FROM dbstiqueue.tblqueue WHERE TransactDate='" + transactDate + "'") > 0)
                 {
-                    update_accounting = int.Parse(refresher_accounting.GetString(2));
-                    calling_accounting = int.Parse(refresher_accounting.GetString(3));
-                    computed_accounting = int.Parse(refresher_accounting.GetString(5));
-                }
-                refresher_accounting.Close();
-                MySqlDataReader refresher_registrar = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "2" + "' and TransactDate like '" + transactDate + "'");
-                while (refresher_registrar.Read())
-                {
-                    update_registrar = int.Parse(refresher_registrar.GetString(2));
-                    calling_registrar = int.Parse(refresher_registrar.GetString(3));
-                    computed_registrar = int.Parse(refresher_registrar.GetString(5));
-                }
-                refresher_registrar.Close();
-                MySqlDataReader refresher_cashier = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "3" + "' and TransactDate like '" + transactDate + "'");
-                while (refresher_cashier.Read())
-                {
-                    update_cashier = int.Parse(refresher_cashier.GetString(2));
-                    calling_cashier = int.Parse(refresher_cashier.GetString(3));
-                    computed_cashier = int.Parse(refresher_cashier.GetString(5));
-                }
-                refresher_cashier.Close();
-                if (update_accounting == 1)
-                {
-                    MySqlDataReader loader = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "1" + "'");
-                    while (loader.Read())
+                    MySqlDataReader queue_reader = Program.Query("SELECT * FROM dbstiqueue.tblqueue WHERE TransactDate='" + transactDate + "' LIMIT 0,1 ");
+                    while (queue_reader.Read())
                     {
-                        lblAcc.Text = loader.GetString(1);
+                        user = queue_reader.GetString(0);
+                        action = queue_reader.GetString(2);
+                        display = queue_reader.GetString(1);
                     }
-                    loader.Close();
-                    switch (lblAcc.Text.Length)
+                    queue_reader.Close();
+                    if (int.Parse(display) >= 100)
                     {
-                        case 1:
+                        isHundred = true;
+                        hundredths = int.Parse(display) / 100;
+                        num = int.Parse(display) - (hundredths * 100);
+                    }
+                    else
+                    {
+                        isHundred = false;
+                        num = int.Parse(display);
+                    }
+
+                    if (num >= 20)
+                    {
+                        isTwenty = true;
+                        tenths = num / 10;
+                        num = num - (tenths * 10);
+                    }
+                    else
+                    {
+                        isTwenty = false;
+                    }
+
+                    switch (action)
+                    {
+                        case "Serve":
                             {
-                                lblAcc.Text = "00" + lblAcc.Text;
+                                forServe = new Thread(Serve);
+                                forServe.Start();
+                                switch (user)
+                                {
+                                    case "Accounting":
+                                        {
+                                            switch (display.Length)
+                                            {
+                                                case 1:
+                                                    {
+                                                        lblAccounting.Text = "00" + display;
+                                                        break;
+                                                    }
+                                                case 2:
+                                                    {
+                                                        lblAccounting.Text = "0" + display;
+                                                        break;
+                                                    }
+                                                case 3:
+                                                    {
+                                                        lblAccounting.Text = display;
+                                                        break;
+                                                    }
+                                            }
+                                            break;
+                                        }
+                                    case "Registrar":
+                                        {
+                                            switch (display.Length)
+                                            {
+                                                case 1:
+                                                    {
+                                                        lblRegistrar.Text = "00" + display;
+                                                        break;
+                                                    }
+                                                case 2:
+                                                    {
+                                                        lblRegistrar.Text = "0" + display;
+                                                        break;
+                                                    }
+                                                case 3:
+                                                    {
+                                                        lblRegistrar.Text = display;
+                                                        break;
+                                                    }
+                                            }
+                                            break;
+                                        }
+                                    case "Cashier":
+                                        {
+                                            switch (display.Length)
+                                            {
+                                                case 1:
+                                                    {
+                                                        lblCashier.Text = "00" + display;
+                                                        break;
+                                                    }
+                                                case 2:
+                                                    {
+                                                        lblCashier.Text = "0" + display;
+                                                        break;
+                                                    }
+                                                case 3:
+                                                    {
+                                                        lblCashier.Text = display;
+                                                        break;
+                                                    }
+                                            }
+                                            break;
+                                        }
+                                }
                                 break;
                             }
-                        case 2:
+                        case "Call":
                             {
-                                lblAcc.Text = "0" + lblAcc.Text;
-                                break;
-                            }
-                    }
-                    Program.Query("Update dbstiqueue.tblscreen set Serving = '" + "0" + "' where Window = '" + "1" + "'").Close();
-                }
-                if (calling_accounting == 1)
-                {
-                    Program.Query("Update dbstiqueue.tblscreen set Calling = '" + "0" + "' where Window = '" + "1" + "'").Close();
-                    AccountingCall();
-                }
-                if (computed_accounting == 1)
-                {
-                    MySqlDataReader loader = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "1" + "'");
-                    while (loader.Read())
-                    {
-                        lblAccTime.Text = loader.GetString(4);
-                    }
-                    loader.Close();
-                    Program.Query("Update dbstiqueue.tblscreen set Computed = '" + "0" + "' where Window = '" + "1" + "'").Close();
-                }
-                if (update_registrar == 1)
-                {
-                    MySqlDataReader loader = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "2" + "'");
-                    while (loader.Read())
-                    {
-                        lblReg.Text = loader.GetString(1);
-                    }
-                    loader.Close();
-                    switch (lblReg.Text.Length)
-                    {
-                        case 1:
-                            {
-                                lblReg.Text = "00" + lblReg.Text;
-                                break;
-                            }
-                        case 2:
-                            {
-                                lblReg  .Text = "0" + lblReg.Text;
-                                break;
-                            }
-                    }
-                    Program.Query("Update dbstiqueue.tblscreen set Serving = '" + "0" + "' where Window = '" + "2" + "'").Close();
-                }
-                if (calling_registrar == 1)
-                {
-                    Program.Query("Update dbstiqueue.tblscreen set Calling = '" + "0" + "' where Window = '" + "2" + "'").Close();
-                    RegistrarCall();
-                }
-                if (computed_registrar == 1)
-                {
-                    MySqlDataReader loader = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "2" + "'");
-                    while (loader.Read())
-                    {
-                        lblRegTime.Text = loader.GetString(4);
-                    }
-                    loader.Close();
-                    Program.Query("Update dbstiqueue.tblscreen set Computed = '" + "0" + "' where Window = '" + "2" + "'").Close();
-                }
-                if (update_cashier == 1)
-                {
-                    MySqlDataReader loader = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "3" + "'");
-                    while (loader.Read())
-                    {
-                        lblCash.Text = loader.GetString(1);
-                    }
-                    loader.Close();
-                    switch (lblCash.Text.Length)
-                    {
-                        case 1:
-                            {
-                                lblCash.Text = "00" + lblCash.Text;
-                                break;
-                            }
-                        case 2:
-                            {
-                                lblCash.Text = "0" + lblCash.Text;
+                                forCall = new Thread(Call);
+                                forCall.Start();
                                 break;
                             }
                     }
-                    Program.Query("Update dbstiqueue.tblscreen set Serving = '" + "0" + "' where Window = '" + "3" + "'").Close();
                 }
-                if (calling_cashier == 1)
+                else
                 {
-                    Program.Query("Update dbstiqueue.tblscreen set Calling = '" + "0" + "' where Window = '" + "3" + "'").Close();
-                    CashierCall();
+                    Program.Query("DELETE FROM dbstiqueue.tblqueue WHERE Window= '" + user + "'").Close();
+                    isUpdating = false;
                 }
-                if (computed_cashier == 1)
-                {
-                    MySqlDataReader loader = Program.Query("Select * from dbstiqueue.tblscreen where Window like '" + "3" + "'");
-                    while (loader.Read())
-                    {
-                        lblCashTime.Text = loader.GetString(4);
-                    }
-                    loader.Close();
-                    Program.Query("Update dbstiqueue.tblscreen set Computed = '" + "0" + "' where Window = '" + "3" + "'").Close();
-                }
-                isUpdating = false;
             }
-            lblClock.Text = DateTime.Now.ToString("MMM dd, yyyy hh:mm:ss tt");
-            if (isCalling == true)
+        }
+
+        private void Serve()
+        {
+            tone.SoundLocation = "beep_once.wav";
+            tone.PlaySync();
+            isBlinking = true;
+            tone.SoundLocation = "n.wav";
+            tone.PlaySync();
+            if (isHundred == true)
             {
-                soundCounter++;
+                switch (hundredths)
+                {
+                    case 1:
+                        {
+                            tone.SoundLocation = "1h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 2:
+                        {
+                            tone.SoundLocation = "2h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 3:
+                        {
+                            tone.SoundLocation = "3h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 4:
+                        {
+                            tone.SoundLocation = "4h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 5:
+                        {
+                            tone.SoundLocation = "5h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 6:
+                        {
+                            tone.SoundLocation = "6h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 7:
+                        {
+                            tone.SoundLocation = "7h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 8:
+                        {
+                            tone.SoundLocation = "8h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 9:
+                        {
+                            tone.SoundLocation = "9h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+
+                }
             }
-            if (isBlinking_Accounting == true)
+            if (isTwenty == true)
             {
-                blinkAccounting();
+                switch (tenths)
+                {
+                    case 2:
+                        {
+                            tone.SoundLocation = "20.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 3:
+                        {
+                            tone.SoundLocation = "30.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 4:
+                        {
+                            tone.SoundLocation = "40.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 5:
+                        {
+                            tone.SoundLocation = "50.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 6:
+                        {
+                            tone.SoundLocation = "60.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 7:
+                        {
+                            tone.SoundLocation = "70.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 8:
+                        {
+                            tone.SoundLocation = "80.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 9:
+                        {
+                            tone.SoundLocation = "90.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                }
+                switch (num)
+                {
+                    case 0:
+                        {
+                            break;
+                        }
+                    case 1:
+                        {
+                            tone.SoundLocation = "1.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 2:
+                        {
+                            tone.SoundLocation = "2.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 3:
+                        {
+                            tone.SoundLocation = "3.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 4:
+                        {
+                            tone.SoundLocation = "4.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 5:
+                        {
+                            tone.SoundLocation = "5.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 6:
+                        {
+                            tone.SoundLocation = "6.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 7:
+                        {
+                            tone.SoundLocation = "7.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 8:
+                        {
+                            tone.SoundLocation = "8.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 9:
+                        {
+                            tone.SoundLocation = "9.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                }
             }
-            if (isBlinking_Registrar == true)
+            else
             {
-                blinkRegistrar();
+                switch (num)
+                {
+                    case 0:
+                        {
+                            break;
+                        }
+                    case 1:
+                        {
+                            tone.SoundLocation = "1.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 2:
+                        {
+                            tone.SoundLocation = "2.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 3:
+                        {
+                            tone.SoundLocation = "3.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 4:
+                        {
+                            tone.SoundLocation = "4.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 5:
+                        {
+                            tone.SoundLocation = "5.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 6:
+                        {
+                            tone.SoundLocation = "6.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 7:
+                        {
+                            tone.SoundLocation = "7.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 8:
+                        {
+                            tone.SoundLocation = "8.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 9:
+                        {
+                            tone.SoundLocation = "9.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 10:
+                        {
+                            tone.SoundLocation = "10.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 11:
+                        {
+                            tone.SoundLocation = "11.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 12:
+                        {
+                            tone.SoundLocation = "12.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 13:
+                        {
+                            tone.SoundLocation = "13.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 14:
+                        {
+                            tone.SoundLocation = "14.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 15:
+                        {
+                            tone.SoundLocation = "15.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 16:
+                        {
+                            tone.SoundLocation = "16.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 17:
+                        {
+                            tone.SoundLocation = "17.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 18:
+                        {
+                            tone.SoundLocation = "18.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 19:
+                        {
+                            tone.SoundLocation = "19.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                }
             }
-            if (isBlinking_Cashier == true)
+
+            switch (user)
             {
-                blinkCashier();
+                case "Accounting":
+                    {
+                        tone.SoundLocation = "a1.wav";
+                        tone.PlaySync();
+                        break;
+                    }
+                case "Registrar":
+                    {
+                        tone.SoundLocation = "a2.wav";
+                        tone.PlaySync();
+                        break;
+                    }
+                case "Cashier":
+                    {
+                        tone.SoundLocation = "a3.wav";
+                        tone.PlaySync();
+                        break;
+                    }
             }
+            Program.Query("DELETE FROM dbstiqueue.tblqueue WHERE Window='" + user + "' AND TicketNo='" + display + "' AND Action='" + "Serve" + "'").Close();
+            isUpdating = false;
+        }
+
+        private void Call()
+        {
+            tone.SoundLocation = "beep_twice.wav";
+            tone.PlaySync();
+            tone.SoundLocation = "Calling.wav";
+            tone.PlaySync();
+            isBlinking = true;
+            if (isHundred == true)
+            {
+                switch (hundredths)
+                {
+                    case 1:
+                        {
+                            tone.SoundLocation = "1h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 2:
+                        {
+                            tone.SoundLocation = "2h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 3:
+                        {
+                            tone.SoundLocation = "3h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 4:
+                        {
+                            tone.SoundLocation = "4h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 5:
+                        {
+                            tone.SoundLocation = "5h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 6:
+                        {
+                            tone.SoundLocation = "6h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 7:
+                        {
+                            tone.SoundLocation = "7h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 8:
+                        {
+                            tone.SoundLocation = "8h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 9:
+                        {
+                            tone.SoundLocation = "9h.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+
+                }
+            }
+            if (isTwenty == true)
+            {
+                switch (tenths)
+                {
+                    case 2:
+                        {
+                            tone.SoundLocation = "20.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 3:
+                        {
+                            tone.SoundLocation = "30.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 4:
+                        {
+                            tone.SoundLocation = "40.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 5:
+                        {
+                            tone.SoundLocation = "50.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 6:
+                        {
+                            tone.SoundLocation = "60.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 7:
+                        {
+                            tone.SoundLocation = "70.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 8:
+                        {
+                            tone.SoundLocation = "80.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 9:
+                        {
+                            tone.SoundLocation = "90.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                }
+                switch (num)
+                {
+                    case 0:
+                        {
+                            break;
+                        }
+                    case 1:
+                        {
+                            tone.SoundLocation = "1.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 2:
+                        {
+                            tone.SoundLocation = "2.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 3:
+                        {
+                            tone.SoundLocation = "3.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 4:
+                        {
+                            tone.SoundLocation = "4.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 5:
+                        {
+                            tone.SoundLocation = "5.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 6:
+                        {
+                            tone.SoundLocation = "6.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 7:
+                        {
+                            tone.SoundLocation = "7.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 8:
+                        {
+                            tone.SoundLocation = "8.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 9:
+                        {
+                            tone.SoundLocation = "9.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                switch (num)
+                {
+                    case 0:
+                        {
+                            break;
+                        }
+                    case 1:
+                        {
+                            tone.SoundLocation = "1.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 2:
+                        {
+                            tone.SoundLocation = "2.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 3:
+                        {
+                            tone.SoundLocation = "3.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 4:
+                        {
+                            tone.SoundLocation = "4.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 5:
+                        {
+                            tone.SoundLocation = "5.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 6:
+                        {
+                            tone.SoundLocation = "6.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 7:
+                        {
+                            tone.SoundLocation = "7.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 8:
+                        {
+                            tone.SoundLocation = "8.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 9:
+                        {
+                            tone.SoundLocation = "9.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 10:
+                        {
+                            tone.SoundLocation = "10.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 11:
+                        {
+                            tone.SoundLocation = "11.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 12:
+                        {
+                            tone.SoundLocation = "12.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 13:
+                        {
+                            tone.SoundLocation = "13.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 14:
+                        {
+                            tone.SoundLocation = "14.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 15:
+                        {
+                            tone.SoundLocation = "15.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 16:
+                        {
+                            tone.SoundLocation = "16.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 17:
+                        {
+                            tone.SoundLocation = "17.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 18:
+                        {
+                            tone.SoundLocation = "18.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                    case 19:
+                        {
+                            tone.SoundLocation = "19.wav";
+                            tone.PlaySync();
+                            break;
+                        }
+                }
+            }
+
+            switch (user)
+            {
+                case "Accounting":
+                    {
+                        tone.SoundLocation = "a1.wav";
+                        tone.PlaySync();
+                        break;
+                    }
+                case "Registrar":
+                    {
+                        tone.SoundLocation = "a2.wav";
+                        tone.PlaySync();
+                        break;
+                    }
+                case "Cashier":
+                    {
+                        tone.SoundLocation = "a3.wav";
+                        tone.PlaySync();
+                        break;
+                    }
+            }
+            Program.Query("DELETE FROM dbstiqueue.tblqueue WHERE Window='" + user + "' AND TicketNo='" + display + "' AND Action='" + "Call" + "'").Close();
+            isUpdating = false;
         }
 
         private void timerNews_Tick(object sender, EventArgs e)
@@ -192,150 +970,6 @@ namespace STI_Queuing_System
             else
             {
                 lblNews.Left = lblNews.Left - 5;
-            }
-        }
-
-        private void AccountingCall()
-        {
-            if (soundCounter > 50)
-            {
-                isCalling = false;
-                soundCounter = 0;
-            }
-            if (isCalling == false)
-            {
-                isCalling = true;
-                SoundPlayer player = new SoundPlayer();
-                player.SoundLocation = "beep.wav";
-                player.Play();
-            }
-            isBlinking_Accounting = true;
-        }
-
-        private void blinkAccounting()
-        {
-            blinker_accounting++;
-            if (blinker_accounting >= 5 && blinker_accounting <= 9)
-            {
-                lblAcc.Visible = false;
-            }
-            else if (blinker_accounting >= 10 && blinker_accounting <= 14)
-            {
-                lblAcc.Visible = true;
-            }
-            else if (blinker_accounting >= 15 && blinker_accounting <= 19)
-            {
-                lblAcc.Visible = false;
-            }
-            else if (blinker_accounting > 19 && blinker_accounting <= 24)
-            {
-                lblAcc.Visible = true;
-            }
-            else if (blinker_accounting > 25 && blinker_accounting <= 29)
-            {
-                lblAcc.Visible = false;
-            }
-            else if (blinker_accounting > 29)
-            {
-                lblAcc.Visible = true;
-                blinker_accounting = 0;
-                isBlinking_Accounting = false;
-            }
-        }
-
-        private void RegistrarCall()
-        {
-            if (soundCounter > 50)
-            {
-                isCalling = false;
-                soundCounter = 0;
-            }
-            if (isCalling == false)
-            {
-                isCalling = true;
-                SoundPlayer player = new SoundPlayer();
-                player.SoundLocation = "beep.wav";
-                player.Play();
-            }
-            isBlinking_Registrar = true;
-        }
-
-        private void blinkRegistrar()
-        {
-            blinker_registrar++;
-            if (blinker_registrar >= 5 && blinker_registrar <= 9)
-            {
-                lblReg.Visible = false;
-            }
-            else if (blinker_registrar >= 10 && blinker_registrar <= 14)
-            {
-                lblReg.Visible = true;
-            }
-            else if (blinker_registrar >= 15 && blinker_registrar <= 19)
-            {
-                lblReg.Visible = false;
-            }
-            else if (blinker_registrar > 19 && blinker_registrar <= 24)
-            {
-                lblReg.Visible = true;
-            }
-            else if (blinker_registrar > 25 && blinker_registrar <= 29)
-            {
-                lblReg.Visible = false;
-            }
-            else if (blinker_registrar > 29)
-            {
-                lblReg.Visible = true;
-                blinker_registrar = 0;
-                isBlinking_Registrar = false;
-            }
-        }
-
-        private void CashierCall()
-        {
-            if (soundCounter > 50)
-            {
-                isCalling = false;
-                soundCounter = 0;
-            }
-            if (isCalling == false)
-            {
-                isCalling = true;
-                SoundPlayer player = new SoundPlayer();
-                player.SoundLocation = "beep.wav";
-                player.Play();
-            }
-            isBlinking_Cashier = true;
-        }
-
-        private void blinkCashier()
-        {
-            blinker_cashier++;
-            if (blinker_cashier >= 5 && blinker_cashier <= 9)
-            {
-                lblCash.Visible = false;
-            }
-            else if (blinker_cashier >= 10 && blinker_cashier <= 14)
-            {
-                lblCash.Visible = true;
-            }
-            else if (blinker_cashier >= 15 && blinker_cashier <= 19)
-            {
-                lblCash.Visible = false;
-            }
-            else if (blinker_cashier > 19 && blinker_cashier <= 24)
-            {
-                lblCash.Visible = true;
-            }
-            else if (blinker_cashier > 25 && blinker_cashier <= 29)
-            {
-                lblCash.Visible = false;
-            }
-            else if (blinker_cashier > 29)
-            {
-                lblCash.Visible = true;
-                blinker_cashier = 0;
-                isBlinking_Cashier = false;
             }
         }
     }

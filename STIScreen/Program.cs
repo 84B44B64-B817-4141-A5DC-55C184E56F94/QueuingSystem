@@ -9,9 +9,6 @@ namespace STI_Queuing_System
 {
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
@@ -30,9 +27,9 @@ namespace STI_Queuing_System
                 Application.Run();
             }
         }
+        static string appGuid = "95ca36cf-2fe6-4f85-b193-9dad5b9333f8";
         /*TO get appGuid, right-click project name in Solution Explorer then Properties. From Application Tab, click Assembly
           Information then copy GUID and paste it on appGuid here.*/
-        private static string appGuid = "95ca36cf-2fe6-4f85-b193-9dad5b9333f8";
         static bool DBAccessible = true;
         static string read;
         public static MySqlConnection Connect()
@@ -50,7 +47,7 @@ namespace STI_Queuing_System
                 }
             }
             //Change password to your MySQL Server password
-            string ConnectionString = "datasource=" + read + ";port=3306;username=root;password=mySQL09122016;";
+            string ConnectionString = "datasource=" + read + ";port=3306;username=root;password=mySQL09122016;SslMode=none";
             MySqlConnection Connection = new MySqlConnection(ConnectionString);
             Connection.Close();
             try
@@ -67,7 +64,10 @@ namespace STI_Queuing_System
                     MessageBox.Show("Database connect attempt failed.", "MySQL - Error Connection", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            catch { }
+            catch (MySqlException msg)
+            {
+                MessageBox.Show(msg.Message);
+            }
             return Connection;
         }
         //For MySQL Commands SELECT, INSERT, UPDATE, DELETE
@@ -126,4 +126,5 @@ namespace STI_Queuing_System
  * UPDATE = Program.Query("UPDATE DATABASE_NAME.TABLE_NAME SET COLUMN_NAME_1 = CRITERIA, COLUMN_NAME_2 = CRITERIA, etc WHERE COLUMN_NAME = CRITERIA").Close();
  * DELETE = Program.Query("DELETE FROM DATABASE_NAME.TABLE_NAME WHERE COLUMN_NANE = CRITERIA").Close();
  * EXECUTESCALR = Program.Count("SELECT COUNT(*) FROM DATABASE_NAME.TABLE_NAME");
+ * GRANT ACCESS = GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'Pa55w0rd' WITH GRANT OPTION;
  */
